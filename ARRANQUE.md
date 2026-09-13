@@ -53,7 +53,7 @@ No hay nada que activar: **`FLY_API_TOKEN` es un secreto de organización de `np
 
 > El repo tiene que ser **público**. En el plan Free de GitHub los secretos de organización no llegan a los repos privados: ahí `deploy.yml` terminaría en verde con el aviso "Fly no configurado" y no desplegaría nada.
 
-El siguiente push que toque `app/**` despliega; o lánzalo a mano desde **Actions → Desplegar backend en Fly.io → Run workflow**. Como el commit inicial de un repo creado desde la plantilla ya toca `app/**`, el primer despliegue sale solo. El primero tarda varios minutos porque compila Rust.
+El siguiente push que toque `app/**` despliega; o lánzalo a mano desde **Actions → Desplegar backend en Fly.io → Run workflow**. Como el commit inicial de un repo creado desde la plantilla ya toca `app/**`, el primer despliegue sale solo. El primero tarda varios minutos porque construye la imagen de Python e instala las dependencias.
 
 Opcional: define la variable de repositorio (**Settings → Secrets and variables → Actions → Variables**) **`FLY_APP`** si quieres un nombre concreto de app. Sin ella, la app se llama `<repo>-<owner>` en minúsculas, recortado a 30 caracteres.
 
@@ -79,7 +79,7 @@ Sirve igual la primera vez y las siguientes: no hace falta tener el repo para ba
 
 ### Probar la app sin desplegar
 
-Con el repo ya en el PC y [Rust](https://rustup.rs) instalado:
+Con el repo ya en el PC y [uv](https://docs.astral.sh/uv/) instalado:
 
 ```powershell
 pwsh -File tools\arrancar.ps1

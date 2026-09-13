@@ -37,6 +37,8 @@ La carpeta local del PC es un espejo de solo lectura. Nunca la trates como orige
 | Bitácora (Pages) | https://npiobject-labs.github.io/buscaproducto/bitacora.html | idem; el índice lo genera `pages.yml` |
 | Backend (Fly.io, opcional) | `https://<app de Fly>.fly.dev/` · `/salud` · `/holamundo` | `.github/workflows/deploy.yml` en push a `main` que toque `app/**` |
 | Comprobación del backend (Pages) | https://npiobject-labs.github.io/buscaproducto/holamundo.html | página estática que llama a `/holamundo` y `/salud` desde el navegador |
+| API del buscador (Fly) | `https://<app de Fly>.fly.dev/api/v1/…` (cabecera `X-Clave`) | `deploy.yml`; humo de `/api/v1` solo si existe el secreto `BP_CLAVE` |
+| Vigilancia diaria / cosecha nocturna | runs de `vigilar.yml` (07:00 UTC) y `cosechar.yml` (03:00 UTC) | necesitan `BP_CLAVE`; ver `docs/planificacion/HOJA_DE_RUTA.md` |
 
 Pages está siempre activo. Fly también: `FLY_API_TOKEN` es un secreto de la organización `npiobject-labs` y lo heredan sus repos **públicos**, así que `deploy.yml` despliega sin configurar nada. Si el repo fuera privado (plan Free) o viviera fuera de la organización, el secreto no llega y `deploy.yml` termina en verde con el aviso "Fly no configurado" sin desplegar nada.
 
@@ -48,7 +50,7 @@ Pages está siempre activo. Fly también: `FLY_API_TOKEN` es un secreto de la or
 - `docs/holamundo.html` toma el nombre de la app de Fly del `<meta name="fly-app">` (`<repo>-<owner>`, como lo deriva `deploy.yml`). Si el proyecto define `FLY_APP` con otro nombre, actualiza ese `content` en el mismo commit.
 - `app/fly.toml` no lleva clave `app`: el nombre se pasa con `--app` desde `deploy.yml`.
 - El backend escucha en 8080, que es lo que espera Fly; la variable de entorno `PUERTO` solo la usa `tools/arrancar.ps1` para probar en el PC.
-- Mocks estáticos en `docs/`. `docs/index.html` es el mock vivo; los anteriores se archivan en `docs/mocks/NNN-nombre.html`.
+- `docs/index.html` es la **app real** (PWA, un solo fichero, sin CDNs) con modo demo integrado (sin clave muestra datos de ejemplo); las versiones anteriores se archivan en `docs/mocks/NNN-nombre.html`. Al tocarla, repetir la verificación con Playwright (D-16 en DECISIONES.md).
 - El índice `docs/mocks/index.html` lo genera `pages.yml` en cada publicación, leyendo el `<title>` y el `<meta name="build">` de cada mock archivado. No lo edites ni lo commitees: está en `.gitignore`.
 - Cada mock lleva `<meta name="build" content="BU-B1-AAAAMMDD-NNN">` con un número nuevo en cada iteración.
 - Nunca pongas claves, endpoints internos ni datos reales en `docs/`: el sitio es público.

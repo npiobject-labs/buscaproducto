@@ -81,3 +81,24 @@ Formato corto: contexto → decisión → consecuencias → plan B. Las suposici
 ## D-12 · Cierre por criterios, no por fechas
 
 - **Decisión:** el proyecto termina cuando se cumplen los 9 criterios de [PLAN.md §2](PLAN.md#2-qué-significa-el-mejor-buscador-posible), verificados por workflows o por checklist en móvil real y anotados en la bitácora. No hay fechas objetivo: cada sesión cierra un hito de la [HOJA_DE_RUTA.md](HOJA_DE_RUTA.md).
+
+## D-13 · La IA se consulta a través del gateway `apisor.oracle402.com`
+
+- **Contexto:** el usuario indicó ese gateway para consultar agentes IA. El sandbox no puede alcanzarlo, así que no se ha podido inspeccionar su protocolo.
+- **Decisión:** el SDK oficial de Anthropic se configura con `base_url = BP_IA_BASE_URL` (por defecto el gateway) y `auth_token = BP_IA_TOKEN` (Bearer) o `api_key = ANTHROPIC_API_KEY`. Se envía `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`) y, si el gateway lo rechaza con 400/404, se reintenta sin él; se puede desactivar con `BP_IA_FALLBACKS=0`.
+- **[SUPUESTO]** el gateway habla la API de Mensajes de Anthropic (`/v1/messages`) incluida la salida estructurada. **Plan B:** si es compatible con OpenAI u otro esquema, se añade un adaptador de transporte en `app/ia/` sin tocar los agentes.
+
+## D-14 · El cosechador nocturno es el «navegador» del nivel C cuando no hay Firecrawl
+
+- **Contexto:** `fuentes.yml` demostró que la mayoría de tiendas y comparadores españoles devuelven 403 anti-bot incluso a una única petición educada.
+- **Decisión:** en vivo esas fuentes quedan en D (enlace); `cosechar.yml` las visita de noche con Chromium en el runner (robots y ritmo respetados), entrega el markdown al backend y el Extractor saca las ofertas, que se suman a la búsqueda original y la promocionan a C. Con `FIRECRAWL_API_KEY` el nivel C funciona también en vivo.
+- **Consecuencias:** las búsquedas sobre esas fuentes se completan con horas de retraso; sigue sin haber evasión de bloqueos (si Chromium también recibe 403, la fuente se omite y queda registrado).
+
+## D-15 · Keepa y Apify no se implementan por ahora
+
+- **Contexto:** Keepa cuesta ≈ 19 €/mes (rompe el objetivo de ≤ 15 €) y ni Keepa ni Apify se pueden verificar sin clave.
+- **Decisión:** quedan documentados en el catálogo como opcionales; Amazon se cubre por Google Shopping (Serper devuelve ofertas de Amazon.es) y por enlace directo. Se implementarán solo si el usuario decide pagarlos.
+
+## D-16 · La verificación de la interfaz la hace Playwright en la sesión
+
+- **Decisión:** la checklist de PLAN.md §12 se automatiza con un script de Playwright (Chromium preinstalado en el sandbox) contra el backend local y `docs/` servido por HTTP: 27 comprobaciones en móvil (390 px) y escritorio, sin errores de consola. Se repite en cada sesión que toque `docs/index.html`.

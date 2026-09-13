@@ -1,6 +1,13 @@
 # buscaproducto
 
-Plantilla del método "PC arranca, móvil continúa":
+Buscador personal de productos: escribes lo que quieres («mini pc 8 GB para tenerlo 24/7 entre 130 y 330 €») o rellenas especificaciones, y agrega ofertas de comparadores, tiendas y marketplaces con ayuda de IA (interpretación de la consulta, extracción de atributos, adaptador universal para cualquier web con `{q}`, investigador de requisitos blandos con citas, comparador), con histórico de precios, alertas por Telegram y catálogo de fuentes ampliable a mano.
+
+- **Web (PWA):** https://npiobject-labs.github.io/buscaproducto/ · funciona en modo demo sin backend; con la clave del backend (pestaña Estado) busca de verdad.
+- **Backend:** FastAPI en Fly (`app/`), API en `/api/v1` protegida con `X-Clave`; SQLite en volumen.
+- **Planificación y estado:** [`docs/planificacion/`](docs/planificacion/) (empieza por `PLAN.md`; la hoja de ruta dice qué falta y qué secretos hacen falta).
+- **Desarrollo local:** `cd app && uv sync --group dev && uv run pytest` · web con backend local: `tools/arrancar.ps1` (Windows) o `uv run uvicorn app.main:app` + `python -m http.server 8081` en `docs/` y abrir `http://localhost:8081/?api=8080`.
+
+Repositorio creado desde la plantilla del método "PC arranca, móvil continúa":
 
 - El repositorio es la **única fuente de verdad**: código, planificación y decisiones viven aquí.
 - El trabajo se hace en **sesiones de claude.ai/code** con este repo seleccionado, desde el móvil o desde la web, con el PC apagado.
@@ -10,7 +17,7 @@ Plantilla del método "PC arranca, móvil continúa":
 - **Nada se verifica desde la sesión**: el sandbox no alcanza internet, así que los despliegues los comprueban los propios workflows.
 - El **PC solo sirve para aterrizar** una copia de lectura con `tools/aterrizar.ps1`; nunca es origen de cambios.
 - Un proyecto nuevo son **dos pasos manuales**: crear el repo desde la plantilla y activar Pages. El resto lo hace `init-plantilla.yml`.
-- Esa inicialización deja el repo **entero** con su nombre —hasta el paquete Rust, el `GET /` del backend y el prefijo del `build`—, aparta la historia de la plantilla a `docs/plantilla/` y **falla el run** si se deja algo sin sustituir.
+- Esa inicialización deja el repo **entero** con su nombre —hasta el `GET /` del backend y el prefijo del `build`—, aparta la historia de la plantilla a `docs/plantilla/` y **falla el run** si se deja algo sin sustituir. (El backend de plantilla era Rust; este proyecto lo sustituyó por Python en F2, ver `docs/planificacion/DECISIONES.md` D-01.)
 
 Empieza por [`ARRANQUE.md`](ARRANQUE.md) · Reglas para los agentes en [`CLAUDE.md`](CLAUDE.md) · Planificación en [`docs/planificacion/`](docs/planificacion/).
 

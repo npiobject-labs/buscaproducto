@@ -122,6 +122,8 @@ Es la **definición de hecho global**: el proyecto se da por terminado cuando se
 
 Total estimado: **23 sesiones**. Orden estricto F1 → F5; F6, F7 y F8 pueden intercalarse. Detalle por sesión, con prompt de arranque, en [HOJA_DE_RUTA.md](HOJA_DE_RUTA.md).
 
+> **Estado (13-09-2026):** F1–F8 desarrolladas en una sola sesión larga y desplegadas desde la rama; queda la verificación en vivo que depende de secretos (ver «Estado tras la sesión» en HOJA_DE_RUTA.md) y la sesión de cierre 9.1.
+
 ## 7. Estrategia de fuentes
 
 Cada herramienta del catálogo tiene un **nivel de integración**, del más fiable al menos:
