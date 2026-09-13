@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import tempfile
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import FileResponse
 
 from ..bd import de_json
 from ..config import config
@@ -59,3 +63,13 @@ async def estado_general(st=Depends(estado)):
             d: {"fallos": e.fallos, "abierto": e.abierto_hasta > 0} for d, e in st.http.dominios.items()
         },
     }
+
+
+@router.get("/exportar/copia.sqlite")
+async def copia_sqlite(st=Depends(estado)):
+    """Copia consistente de la BD (VACUUM INTO) para la copia de seguridad diaria de vigilar.yml."""
+    destino = Path(tempfile.gettempdir()) / f"copia-{config.build_id[:7]}.sqlite"
+    if destino.exists():
+        destino.unlink()
+    await st.bd.c.execute("VACUUM INTO ?", (str(destino),))
+    return FileResponse(str(destino), media_type="application/vnd.sqlite3", filename="buscaproducto.sqlite")

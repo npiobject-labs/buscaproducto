@@ -4,10 +4,20 @@ from typing import Any
 
 from fastapi import APIRouter, Depends
 
-from ..tareas import telegram, vigilar
+from ..tareas import cosecha_backend, telegram, vigilar
 from . import Protegido, estado
 
 router = APIRouter(prefix="/tareas", tags=["tareas"], dependencies=[Protegido])
+
+
+@router.get("/cosecha/pendientes")
+async def cosecha_pendientes(st=Depends(estado)):
+    return await cosecha_backend.pendientes(st.bd)
+
+
+@router.post("/cosecha")
+async def cosecha_procesar(cuerpo: dict[str, Any], st=Depends(estado)):
+    return await cosecha_backend.procesar(st.bd, st.ia, cuerpo)
 
 
 @router.post("/vigilar")

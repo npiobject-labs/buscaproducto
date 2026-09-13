@@ -53,3 +53,14 @@ jobs:
             sleep 20
           done
           echo "::error::La vigilancia no respondio"; exit 1
+      - name: Descargar copia de seguridad de la BD
+        env:
+          FLY_APP: ${{ steps.app.outputs.app }}
+        run: |
+          curl -fsS --max-time 120 -H "X-Clave: ${BP_CLAVE}" -o buscaproducto.sqlite "https://${FLY_APP}.fly.dev/api/v1/exportar/copia.sqlite"
+          ls -la buscaproducto.sqlite
+      - uses: actions/upload-artifact@v4
+        with:
+          name: copia-bd-${{ github.run_id }}
+          path: buscaproducto.sqlite
+          retention-days: 30
