@@ -1,0 +1,39 @@
+{
+  "fecha": "2026-09-13T19:13:00+02:00",
+  "titulo": "Planificación completa del buscador de productos (F0)",
+  "objetivo": "Generar la mejor planificación posible, a partir del PLAN.md y el CATALOGO_HERRAMIENTAS.md del proyecto local, para llevar la app hasta el mejor buscador posible, con scrapers y agentes IA.",
+  "prompts": [
+    {
+      "texto": "Genera la mejor planificación posible, basada en los documentos adjuntos (CATALOGO_HERRAMIENTAS.md y PLAN.md), para buscar productos. No tienes restricciones. Si es necesario, utiliza scrappers y agentes IA. Para cuando consideres que la app cumple con todas las funcionalidades del mejor buscador posible.",
+      "nota": "Adjuntos: el plan y el catálogo del proyecto local en Windows (Python, Fases 1 y 2 hechas allí)."
+    },
+    { "texto": "desconecto" },
+    { "texto": "internet, sigue trabajando" }
+  ],
+  "cambios": [
+    "docs/planificacion/PLAN.md: plan maestro con 9 criterios de cierre, requisitos, 9 fases, estrategia de fuentes (niveles A/B/C/D) e IA (4 agentes), costes, riesgos y verificación.",
+    "docs/planificacion/ARQUITECTURA.md: frontend PWA en Pages, backend FastAPI en Fly con SQLite en volumen, modelo de datos, API /api/v1, pipeline de búsqueda, agentes, anti-bloqueo, crons en Actions, secretos, tests.",
+    "docs/planificacion/CATALOGO_HERRAMIENTAS.md: 39 herramientas en 7 categorías con url_plantilla_busqueda, nivel y fase.",
+    "docs/planificacion/DECISIONES.md: 12 ADR con plan B (Python en vez de Rust, Pages+Fly, SQLite, clave X-Clave, crons en Actions, Playwright en runner, modelos Claude, Serper/Keepa, adaptador universal IA, reparador por PR, 3 casos de aceptación, cierre por criterios).",
+    "docs/planificacion/HOJA_DE_RUTA.md: 23 sesiones con criterio verificable y prompt de arranque; tabla de secretos.",
+    "docs/planificacion/README.md y CLAUDE.md: índice y puntero a la planificación."
+  ],
+  "sha": "278068b",
+  "sha_completo": "278068b9c8c95dcc6cb7de7402531d193b12e2b5",
+  "run": "",
+  "mock": "",
+  "build": "BU-B1-20260910-002",
+  "pagina": "planificacion/PLAN.md",
+  "fly": null,
+  "pendiente": [
+    "Fusionar la PR en main para que Pages publique la planificación",
+    "Confirmar D-01 (backend en Python desde F2)",
+    "Sesión 1.1: mock completo en docs/index.html",
+    "Verificar las URL de búsqueda marcadas (verificar) en la sesión 2.3"
+  ],
+  "enlaces": [
+    { "texto": "Plan maestro", "url": "planificacion/PLAN.md" },
+    { "texto": "Hoja de ruta", "url": "planificacion/HOJA_DE_RUTA.md" }
+  ],
+  "notas": "Sin cambios en el mock ni en el backend: sesión solo de documentación. Trabajo en rama con PR en borrador; el run de Pages se producirá al fusionar."
+}
