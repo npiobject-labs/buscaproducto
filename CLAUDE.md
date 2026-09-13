@@ -9,12 +9,12 @@ Flujo "PC arranca, móvil continúa": el desarrollo, la revisión y las pruebas 
 | Proyecto | `buscaproducto` |
 | Owner de GitHub | `npiobject-labs` |
 | App de Fly.io | `buscaproducto-npiobject-labs` |
-| Carpeta de Drive (id) | `17fTMr0BSKGLFcAYC-U_L54WuBBG09rUU` |
+| Carpeta de Drive (id) | `121ANQkl_1f8XAPVhkL9WOHOMM5A-Y1ZW` |
 
 Esta tabla la rellena sola `.github/workflows/init-plantilla.yml` en el primer push de un repo creado desde la plantilla; no hay nada que tocar a mano salvo el id de Drive.
 
 - **App de Fly.io**: `derivada` significa que `deploy.yml` la calcula como `<repo>-<owner>` en minúsculas, saneado a `[a-z0-9-]` y recortado a 30 caracteres. Si existe la variable de repositorio `FLY_APP`, esa manda; anota aquí el valor cuando la definas.
-- **Carpeta de Drive (id)**: vacío significa que este proyecto no usa Drive. Ver ARRANQUE.md para activarlo a mitad de proyecto.
+- **Carpeta de Drive (id)**: vacío significa que este proyecto no usa Drive. Ver ARRANQUE.md para activarlo a mitad de proyecto. La carpeta es `Mi unidad/buscaproducto` de la cuenta **fsantagonza@gmail.com**, que es la que tiene conectado el conector de Drive. El id anterior (`17fTMr0B…`) era de otra cuenta y desde las sesiones daba «Requested entity was not found».
 
 ## Fuente de verdad
 
