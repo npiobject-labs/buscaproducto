@@ -2,26 +2,792 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="build" content="BU-B1-20260910-002">
-  <title>buscaproducto · mock 0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="build" content="BU-B1-20260913-003">
+  <meta name="fly-app" content="buscaproducto-npiobject-labs">
+  <meta name="theme-color" content="#0b6e7a">
+  <meta name="description" content="Buscador de productos por especificaciones, precio y fuentes, con ayuda de IA.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icono.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icono.svg">
+  <title>buscaproducto</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 2rem; background: #fafafa; color: #1a1a1a; }
-    main { max-width: 40rem; margin: 0 auto; }
-    h1 { font-size: 1.5rem; margin: 0 0 .5rem; }
-    p { color: #555; line-height: 1.5; }
-    code { background: #eee; padding: .15rem .35rem; border-radius: 3px; }
-    a { color: #0b6e7a; text-underline-offset: 2px; }
-    .enlaces { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid #e2e2e2; }
+    :root {
+      --fondo: #f6f7f9; --panel: #ffffff; --texto: #1a1d21; --suave: #5a6270; --borde: #dfe3e8; --acento: #0b6e7a; --acento-2: #7fd4de;
+      --ok: #1f8a4c; --aviso: #b26b00; --error: #b3261e; --sombra: 0 1px 2px rgba(0,0,0,.06), 0 4px 14px rgba(0,0,0,.05); --radio: 12px;
+      color-scheme: light dark;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --fondo: #14171a; --panel: #1d2126; --texto: #e8eaed; --suave: #9aa4ad; --borde: #2c3238; --acento: #3fb5c4; --acento-2: #1f5c64; --ok: #4ec27a; --aviso: #e0a33a; --error: #f08a80; --sombra: 0 1px 2px rgba(0,0,0,.4); }
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--fondo); color: var(--texto); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    a { color: var(--acento); text-underline-offset: 2px; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; border: 1px solid var(--borde); background: var(--panel); border-radius: 8px; padding: .45rem .8rem; }
+    button.primario { background: var(--acento); color: #fff; border-color: var(--acento); font-weight: 600; }
+    button.pequeno { padding: .25rem .55rem; font-size: .85rem; }
+    button:disabled { opacity: .55; cursor: default; }
+    input[type=text], input[type=number], input[type=url], input[type=password], input[type=search], select, textarea { width: 100%; padding: .5rem .6rem; border: 1px solid var(--borde); border-radius: 8px; background: var(--panel); }
+    textarea { min-height: 3.6rem; resize: vertical; }
+    label { display: block; font-size: .85rem; color: var(--suave); margin: .55rem 0 .2rem; }
+    .demo { position: sticky; top: 0; z-index: 30; background: var(--aviso); color: #fff; text-align: center; font-weight: 600; padding: .35rem .6rem; font-size: .85rem; }
+    .demo.oculto, [hidden] { display: none !important; }
+    header.app { display: flex; gap: .75rem; align-items: center; justify-content: space-between; padding: .7rem 1rem; background: var(--panel); border-bottom: 1px solid var(--borde); position: sticky; top: 0; z-index: 20; }
+    header.app h1 { font-size: 1.15rem; margin: 0; display: flex; align-items: center; gap: .5rem; }
+    header.app h1 img { width: 26px; height: 26px; }
+    .estado-conexion { font-size: .78rem; color: var(--suave); display: flex; gap: .4rem; align-items: center; }
+    .punto { width: 9px; height: 9px; border-radius: 50%; background: var(--aviso); display: inline-block; }
+    .punto.ok { background: var(--ok); } .punto.error { background: var(--error); }
+    nav.pestanas { display: flex; gap: .25rem; padding: .5rem 1rem 0; background: var(--panel); border-bottom: 1px solid var(--borde); overflow-x: auto; }
+    nav.pestanas button { border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: transparent; padding: .5rem .8rem; color: var(--suave); white-space: nowrap; }
+    nav.pestanas button[aria-selected=true] { color: var(--acento); border-bottom-color: var(--acento); font-weight: 600; }
+    nav.pestanas button .n { display: inline-block; min-width: 1.3em; padding: 0 .35em; margin-left: .3em; border-radius: 999px; background: var(--acento-2); color: var(--texto); font-size: .75rem; }
+    main { max-width: 1120px; margin: 0 auto; padding: 1rem 1rem 5.5rem; }
+    section.panel { display: none; } section.panel.activa { display: block; }
+    .tarjeta { background: var(--panel); border: 1px solid var(--borde); border-radius: var(--radio); padding: 1rem; box-shadow: var(--sombra); margin-bottom: 1rem; }
+    .tarjeta h2 { margin: 0 0 .5rem; font-size: 1.05rem; }
+    .fila { display: flex; gap: .75rem; flex-wrap: wrap; align-items: end; }
+    .fila > * { flex: 1 1 140px; min-width: 0; }
+    .fila .estrecho { flex: 0 0 auto; }
+    .acciones { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .75rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .chip { display: inline-flex; align-items: center; gap: .3rem; font-size: .8rem; padding: .15rem .55rem; border-radius: 999px; border: 1px solid var(--borde); background: var(--fondo); }
+    .chip.ok { border-color: var(--ok); color: var(--ok); } .chip.mal { border-color: var(--error); color: var(--error); } .chip.duda { border-color: var(--aviso); color: var(--aviso); }
+    .chip.nivel { font-weight: 700; }
+    .spec { display: grid; grid-template-columns: 1.4fr .8fr 1fr .7fr auto; gap: .4rem; align-items: center; margin-bottom: .4rem; }
+    .spec.blando select:first-child { border-color: var(--aviso); }
+    .fuentes-grupo { margin: .6rem 0; }
+    .fuentes-grupo h3 { font-size: .85rem; color: var(--suave); margin: 0 0 .3rem; text-transform: uppercase; letter-spacing: .03em; }
+    .fuentes-grupo label { display: inline-flex; align-items: center; gap: .35rem; margin: .15rem .6rem .15rem 0; color: var(--texto); font-size: .9rem; }
+    .progreso { display: flex; flex-wrap: wrap; gap: .35rem; margin: .5rem 0; }
+    .barra { height: 6px; background: var(--borde); border-radius: 3px; overflow: hidden; margin: .4rem 0; }
+    .barra > i { display: block; height: 100%; background: var(--acento); width: 0; transition: width .4s; }
+    .producto { display: grid; grid-template-columns: 96px 1fr; gap: .8rem; }
+    .producto img, .producto .sinimg { width: 96px; height: 96px; object-fit: contain; border-radius: 8px; background: var(--fondo); border: 1px solid var(--borde); }
+    .producto .sinimg { display: grid; place-items: center; color: var(--suave); font-size: .75rem; }
+    .producto h3 { margin: 0 0 .3rem; font-size: 1rem; line-height: 1.3; }
+    .precio { font-size: 1.25rem; font-weight: 700; }
+    .puntuacion { font-weight: 700; padding: .1rem .5rem; border-radius: 6px; background: var(--acento-2); color: var(--texto); font-size: .85rem; }
+    .ofertas { margin: .5rem 0 0; padding: 0; list-style: none; }
+    .ofertas li { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; padding: .35rem 0; border-top: 1px dashed var(--borde); font-size: .9rem; }
+    .ofertas li .t { flex: 1 1 200px; }
+    .explicacion { margin: .3rem 0 0; padding: 0; list-style: none; font-size: .8rem; color: var(--suave); display: flex; flex-wrap: wrap; gap: .3rem .8rem; }
+    .explicacion li::before { content: "✓ "; color: var(--ok); } .explicacion li.no::before { content: "✗ "; color: var(--error); } .explicacion li.duda::before { content: "? "; color: var(--aviso); }
+    .vacio { text-align: center; color: var(--suave); padding: 2rem 1rem; }
+    .herr { display: flex; gap: .6rem; align-items: flex-start; padding: .55rem 0; border-top: 1px solid var(--borde); }
+    .herr:first-of-type { border-top: 0; }
+    .herr .cuerpo { flex: 1; min-width: 0; }
+    .herr .cuerpo b { display: block; }
+    .herr .cuerpo small { color: var(--suave); display: block; }
+    .interruptor { position: relative; width: 40px; height: 22px; flex: 0 0 auto; margin-top: .2rem; }
+    .interruptor input { opacity: 0; width: 0; height: 0; }
+    .interruptor span { position: absolute; inset: 0; background: var(--borde); border-radius: 999px; transition: .2s; }
+    .interruptor span::before { content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+    .interruptor input:checked + span { background: var(--acento); } .interruptor input:checked + span::before { transform: translateX(18px); }
+    .interruptor input:focus-visible + span { outline: 2px solid var(--acento); outline-offset: 2px; }
+    dialog { border: 1px solid var(--borde); border-radius: var(--radio); background: var(--panel); color: var(--texto); padding: 1.1rem; width: min(680px, calc(100vw - 2rem)); max-height: calc(100vh - 2rem); box-shadow: var(--sombra); }
+    dialog::backdrop { background: rgba(0,0,0,.45); }
+    dialog h2 { margin: 0 0 .6rem; font-size: 1.05rem; }
+    table.comparar { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    table.comparar th, table.comparar td { border-bottom: 1px solid var(--borde); padding: .35rem .4rem; text-align: left; vertical-align: top; }
+    table.comparar th { color: var(--suave); font-weight: 600; }
+    .grafico svg { width: 100%; height: 180px; display: block; }
+    .eventos { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; white-space: pre-wrap; max-height: 320px; overflow: auto; }
+    .aviso-inline { padding: .5rem .7rem; border-radius: 8px; background: var(--fondo); border: 1px solid var(--borde); font-size: .88rem; color: var(--suave); }
+    .aviso-inline.error { border-color: var(--error); color: var(--error); }
+    .toast { position: fixed; left: 50%; bottom: 4.6rem; transform: translateX(-50%); background: var(--texto); color: var(--fondo); padding: .5rem .9rem; border-radius: 999px; font-size: .88rem; z-index: 50; opacity: 0; transition: opacity .2s; pointer-events: none; }
+    .toast.visible { opacity: 1; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .citas { font-size: .85rem; } .citas li { margin: .25rem 0; }
+    .pie { color: var(--suave); font-size: .8rem; text-align: center; margin-top: 1.5rem; }
+    @media (max-width: 720px) {
+      nav.pestanas { position: fixed; bottom: 0; left: 0; right: 0; top: auto; padding: 0; border-top: 1px solid var(--borde); border-bottom: 0; justify-content: space-around; padding-bottom: env(safe-area-inset-bottom); }
+      nav.pestanas button { flex: 1; font-size: .78rem; padding: .55rem .2rem; border-bottom: 0; border-top: 3px solid transparent; }
+      nav.pestanas button[aria-selected=true] { border-top-color: var(--acento); }
+      .spec { grid-template-columns: 1fr 1fr; }
+      .spec .valor { grid-column: 1 / -1; }
+      .producto { grid-template-columns: 72px 1fr; }
+      .producto img, .producto .sinimg { width: 72px; height: 72px; }
+    }
   </style>
 </head>
 <body>
+  <div id="bannerDemo" class="demo" role="status">DEMO · datos de ejemplo. Guarda la clave del backend en «Estado» para buscar de verdad.</div>
+  <header class="app">
+    <h1><img src="icono.svg" alt="">buscaproducto</h1>
+    <div class="estado-conexion"><span id="punto" class="punto"></span><span id="textoConexion">modo demo</span></div>
+  </header>
+  <nav class="pestanas" role="tablist" aria-label="Secciones">
+    <button role="tab" id="tab-busqueda" aria-controls="panel-busqueda" aria-selected="true" data-tab="busqueda">Búsqueda</button>
+    <button role="tab" id="tab-resultados" aria-controls="panel-resultados" aria-selected="false" data-tab="resultados">Resultados<span class="n" id="nResultados" hidden>0</span></button>
+    <button role="tab" id="tab-herramientas" aria-controls="panel-herramientas" aria-selected="false" data-tab="herramientas">Herramientas</button>
+    <button role="tab" id="tab-alertas" aria-controls="panel-alertas" aria-selected="false" data-tab="alertas">Alertas</button>
+    <button role="tab" id="tab-estado" aria-controls="panel-estado" aria-selected="false" data-tab="estado">Estado</button>
+  </nav>
   <main>
-    <h1>buscaproducto · mock 0</h1>
-    <p>Fase 0 del flujo «PC arranca, móvil continúa».</p>
-    <p>Build: <code>BU-B1-20260910-002</code></p>
-    <p class="enlaces"><a href="bitacora.html">Bitácora del proyecto</a> · cada sesión de trabajo, qué se pidió y qué cambió.<br>
-    <a href="holamundo.html">Comprobación del backend</a> · Pages llama a <code>/holamundo</code> y <code>/salud</code> en Fly.</p>
+    <!-- ============ BÚSQUEDA ============ -->
+    <section class="panel activa" id="panel-busqueda" role="tabpanel" aria-labelledby="tab-busqueda">
+      <div class="tarjeta">
+        <h2>¿Qué buscas?</h2>
+        <textarea id="texto" placeholder="Ej.: mini pc con 8 GB de RAM y 500 GB de disco para tenerlo encendido 24/7, entre 130 y 330 €"></textarea>
+        <div class="acciones">
+          <button id="btnInterpretar">Interpretar con IA</button>
+          <button id="btnBuscar" class="primario">Buscar</button>
+          <button id="btnEjemplo" class="pequeno" title="Rellena el caso de referencia MiniPC">Caso MiniPC</button>
+        </div>
+        <div id="entendido" class="aviso-inline" style="margin-top:.7rem" hidden></div>
+      </div>
+      <div class="tarjeta">
+        <h2>Especificaciones</h2>
+        <div id="specs"></div>
+        <div class="acciones"><button id="btnAddSpec" class="pequeno">+ Añadir especificación</button></div>
+        <div class="fila" style="margin-top:.6rem">
+          <div><label for="precioMin">Precio mínimo (€)</label><input type="number" id="precioMin" min="0" step="1"></div>
+          <div><label for="precioMax">Precio máximo (€)</label><input type="number" id="precioMax" min="0" step="1"></div>
+          <div><label for="estado">Estado</label><select id="estado"><option value="cualquiera">Cualquiera</option><option value="nuevo">Nuevo</option><option value="reacondicionado">Reacondicionado</option><option value="segunda_mano">Segunda mano</option></select></div>
+        </div>
+        <div id="errorRango" class="aviso-inline error" style="margin-top:.5rem" hidden>El precio mínimo no puede ser mayor que el máximo.</div>
+      </div>
+      <div class="tarjeta">
+        <h2>Fuentes a consultar <button id="btnTodasFuentes" class="pequeno" style="float:right">Todas / ninguna</button></h2>
+        <div id="fuentes"></div>
+      </div>
+      <div class="tarjeta" id="tarjetaHistorial" hidden>
+        <h2>Búsquedas recientes</h2>
+        <div id="historial"></div>
+      </div>
+    </section>
+
+    <!-- ============ RESULTADOS ============ -->
+    <section class="panel" id="panel-resultados" role="tabpanel" aria-labelledby="tab-resultados">
+      <div class="tarjeta">
+        <div id="resumenConsulta" class="aviso-inline">Todavía no has buscado nada.</div>
+        <div class="barra" id="barra"><i></i></div>
+        <div class="progreso" id="progreso" aria-live="polite"></div>
+        <div class="acciones">
+          <button id="btnCompartir" class="pequeno">Compartir enlace</button>
+          <button id="btnCsv" class="pequeno">Exportar CSV</button>
+          <button id="btnAlertaBusqueda" class="pequeno">Avisarme de ofertas nuevas</button>
+          <button id="btnComparar" class="pequeno primario" disabled>Comparar (0)</button>
+          <button id="btnRelanzar" class="pequeno">Repetir sin caché</button>
+        </div>
+      </div>
+      <div class="tarjeta">
+        <h2>Filtros</h2>
+        <div class="fila">
+          <div><label>Precio mín.</label><input type="number" id="fPrecioMin" min="0"></div>
+          <div><label>Precio máx.</label><input type="number" id="fPrecioMax" min="0"></div>
+          <div><label>RAM mín. (GB)</label><select id="fRam"><option value="">Cualquiera</option><option>4</option><option>8</option><option>16</option><option>32</option></select></div>
+          <div><label>Disco mín. (GB)</label><select id="fAlm"><option value="">Cualquiera</option><option>128</option><option>256</option><option>500</option><option>1024</option></select></div>
+          <div><label>Estado</label><select id="fEstado"><option value="">Cualquiera</option><option value="nuevo">Nuevo</option><option value="reacondicionado">Reacondicionado</option><option value="segunda_mano">Segunda mano</option></select></div>
+          <div><label>Orden</label><select id="fOrden"><option value="puntuacion">Mejor puntuación</option><option value="precio_asc">Precio ↑</option><option value="precio_desc">Precio ↓</option><option value="valoracion">Valoración</option><option value="mejor_relacion">Mejor relación</option></select></div>
+        </div>
+        <div class="fila" style="margin-top:.5rem">
+          <div><label>Fuente</label><select id="fFuente"><option value="">Todas</option></select></div>
+          <div class="estrecho"><label>&nbsp;</label><label style="display:inline-flex;gap:.4rem;align-items:center;color:var(--texto)"><input type="checkbox" id="f247"> Solo aptos 24/7</label></div>
+          <div class="estrecho"><label>&nbsp;</label><label style="display:inline-flex;gap:.4rem;align-items:center;color:var(--texto)"><input type="checkbox" id="fFuera"> Mostrar fuera de rango</label></div>
+          <div class="estrecho"><label>&nbsp;</label><button id="btnLimpiar" class="pequeno">Limpiar filtros</button></div>
+        </div>
+        <div id="facetas" class="chips" style="margin-top:.6rem"></div>
+      </div>
+      <div id="listaResultados"></div>
+      <div class="tarjeta" id="tarjetaEnlaces" hidden>
+        <h2>Buscar también en (enlace directo)</h2>
+        <div id="enlaces" class="chips"></div>
+      </div>
+    </section>
+
+    <!-- ============ HERRAMIENTAS ============ -->
+    <section class="panel" id="panel-herramientas" role="tabpanel" aria-labelledby="tab-herramientas">
+      <div class="tarjeta">
+        <div class="fila"><div><input type="search" id="buscarHerr" placeholder="Filtrar herramientas…"></div><div class="estrecho"><button id="btnNuevaHerr" class="primario">+ Añadir herramienta</button></div></div>
+        <p class="aviso-inline" style="margin:.7rem 0 0">Niveles: <b>A</b> API · <b>B</b> scraping propio · <b>C</b> IA universal (cualquier web con <code>{q}</code>) · <b>D</b> solo enlace. Una herramienta añadida a mano empieza en D y sube a C sola cuando el extractor IA consigue ofertas.</p>
+      </div>
+      <div id="listaHerramientas"></div>
+    </section>
+
+    <!-- ============ ALERTAS ============ -->
+    <section class="panel" id="panel-alertas" role="tabpanel" aria-labelledby="tab-alertas">
+      <div class="tarjeta"><h2>Alertas</h2><p class="aviso-inline">Se comprueban cada día (workflow <code>vigilar.yml</code>) y avisan por Telegram. Crea una desde un resultado («Avisar si baja de…») o desde una búsqueda («Avisarme de ofertas nuevas»).</p></div>
+      <div id="listaAlertas"></div>
+    </section>
+
+    <!-- ============ ESTADO ============ -->
+    <section class="panel" id="panel-estado" role="tabpanel" aria-labelledby="tab-estado">
+      <div class="tarjeta">
+        <h2>Conexión con el backend</h2>
+        <div class="fila">
+          <div><label for="clave">Clave (X-Clave)</label><input type="password" id="clave" autocomplete="off" placeholder="la que guardaste como secreto BP_CLAVE"></div>
+          <div class="estrecho"><label>&nbsp;</label><button id="btnGuardarClave" class="primario">Guardar y conectar</button></div>
+          <div class="estrecho"><label>&nbsp;</label><button id="btnOlvidarClave">Olvidar</button></div>
+        </div>
+        <p class="aviso-inline" style="margin-top:.6rem">Backend: <code id="urlBackend"></code> · <span id="detalleConexion">sin conectar</span></p>
+      </div>
+      <div class="tarjeta"><h2>Consumo del mes</h2><div id="costes" class="aviso-inline">Solo en modo real.</div></div>
+      <div class="tarjeta"><h2>Fuentes (últimas consultas)</h2><div id="estadoFuentes" class="aviso-inline">Solo en modo real.</div></div>
+      <div class="tarjeta"><h2>Eventos recientes <button id="btnEventos" class="pequeno" style="float:right">Actualizar</button></h2><div id="eventos" class="eventos aviso-inline">Solo en modo real.</div></div>
+      <p class="pie">build <span id="build"></span> · <a href="bitacora.html">bitácora</a> · <a href="planificacion/PLAN.md">plan</a> · <a href="holamundo.html">comprobación del backend</a></p>
+    </section>
   </main>
+
+  <!-- ============ MODALES ============ -->
+  <dialog id="dlgHerr" aria-labelledby="dlgHerrTitulo">
+    <h2 id="dlgHerrTitulo">Añadir herramienta</h2>
+    <form id="formHerr" method="dialog">
+      <input type="hidden" id="hId">
+      <label for="hNombre">Nombre *</label><input type="text" id="hNombre" required maxlength="120">
+      <label for="hCategoria">Categoría *</label>
+      <select id="hCategoria"><option value="comparadores">Comparadores de precios</option><option value="tiendas">Tiendas</option><option value="historico">Histórico y alertas</option><option value="asistentes_ia">Asistentes IA</option><option value="comunidades">Comunidades y reviews</option><option value="otra">Otra</option></select>
+      <label for="hUrl">URL principal *</label><input type="url" id="hUrl" required placeholder="https://…">
+      <label for="hPlantilla">URL de búsqueda con {q}</label><input type="url" id="hPlantilla" placeholder="https://tienda.es/buscar?q={q}">
+      <div class="fila">
+        <div><label for="hTipo">Tipo de acceso</label><select id="hTipo"><option value="web">web</option><option value="api">api</option><option value="extensión">extensión</option><option value="ia">ia</option><option value="comunidad">comunidad</option><option value="rss">rss</option></select></div>
+        <div><label for="hCoste">Coste</label><select id="hCoste"><option value="gratis">gratis</option><option value="freemium">freemium</option><option value="pago">pago</option><option value="open source">open source</option></select></div>
+      </div>
+      <label for="hDesc">Descripción</label><textarea id="hDesc"></textarea>
+      <label style="display:inline-flex;gap:.4rem;align-items:center;color:var(--texto)"><input type="checkbox" id="hJs"> La página de resultados necesita JavaScript (usar Firecrawl)</label>
+      <div id="hError" class="aviso-inline error" hidden></div>
+      <div class="acciones"><button type="submit" class="primario">Guardar</button><button type="button" id="hCancelar">Cancelar</button></div>
+    </form>
+  </dialog>
+  <dialog id="dlgInfo" aria-labelledby="dlgInfoTitulo">
+    <h2 id="dlgInfoTitulo">Detalle</h2>
+    <div id="dlgInfoCuerpo"></div>
+    <div class="acciones"><button id="dlgInfoCerrar">Cerrar</button></div>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+// ------------------------------------------------------------------ utilidades
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const BUILD = document.querySelector('meta[name="build"]').content;
+const eur = (v) => v == null ? '—' : new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(v);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ATRIBUTOS = {
+  ram_gb: ['RAM', 'GB', 'numero'], almacenamiento_gb: ['Almacenamiento', 'GB', 'numero'], cpu: ['Procesador', '', 'texto'], gpu: ['Gráfica', '', 'texto'],
+  tdp_w: ['Consumo (TDP)', 'W', 'numero'], pantalla_pulgadas: ['Pantalla', '"', 'numero'], resolucion: ['Resolución', '', 'texto'], peso_kg: ['Peso', 'kg', 'numero'],
+  bateria_wh: ['Batería', 'Wh', 'numero'], wifi: ['WiFi', '', 'texto'], ethernet_gbps: ['Ethernet', 'Gbps', 'numero'], puertos_usb: ['Puertos USB', '', 'numero'],
+  sistema_operativo: ['Sistema operativo', '', 'texto'], fanless: ['Sin ventilador', '', 'booleano'], apto_24_7: ['Apto 24/7', '', 'booleano'], silencioso: ['Silencioso', '', 'booleano'],
+  pantalla_mate: ['Pantalla mate', '', 'booleano'], openwrt: ['Compatible OpenWrt', '', 'booleano'], formato: ['Formato', '', 'texto'], color: ['Color', '', 'texto'], marca: ['Marca', '', 'texto'], modelo: ['Modelo', '', 'texto'], anio: ['Año', '', 'numero'],
+};
+const BLANDOS = new Set(['apto_24_7', 'silencioso', 'fiable']);
+const CATEGORIAS = { comparadores: 'Comparadores de precios', tiendas: 'Tiendas', historico: 'Histórico y alertas', asistentes_ia: 'Asistentes IA', comunidades: 'Comunidades y reviews', apis_scraping: 'APIs y scraping', infraestructura: 'Infraestructura', otra: 'Otra' };
+const almacen = {
+  get(k, d) { try { const v = localStorage.getItem('bp.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('bp.' + k, JSON.stringify(v)); } catch { /* localStorage bloqueado (file://): se sigue en memoria */ } },
+  del(k) { try { localStorage.removeItem('bp.' + k); } catch { } },
+};
+let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('visible'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('visible'), 2600); }
+function abrir(dlg) { dlg.showModal(); const f = dlg.querySelector('input:not([type=hidden]), select, textarea, button'); if (f) f.focus(); }
+$$('dialog').forEach((d) => d.addEventListener('click', (e) => { const r = d.getBoundingClientRect(); if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close(); }));
+
+// ------------------------------------------------------------------ backend
+const API = (() => {
+  const params = new URLSearchParams(location.search);
+  if (['localhost', '127.0.0.1'].includes(location.hostname)) return `http://localhost:${params.get('api') || 8080}/api/v1`;
+  const app = document.querySelector('meta[name="fly-app"]').content;
+  return `https://${app}.fly.dev/api/v1`;
+})();
+$('#urlBackend').textContent = API;
+$('#build').textContent = BUILD;
+const estado = { real: false, clave: almacen.get('clave', ''), herramientas: [], busquedaId: null, busqueda: null, resultados: null, comparar: new Set(), sondeo: null };
+
+async function api(ruta, opciones = {}) {
+  const r = await fetch(API + ruta, { ...opciones, headers: { 'Content-Type': 'application/json', 'X-Clave': estado.clave, ...(opciones.headers || {}) } });
+  if (r.status === 204) return null;
+  let cuerpo = null; try { cuerpo = await r.json(); } catch { }
+  if (!r.ok) { const d = cuerpo && (cuerpo.detail || cuerpo); throw new Error((d && (d.detalle || d.error)) || `HTTP ${r.status}`); }
+  return cuerpo;
+}
+function ponerConexion(ok, texto) {
+  estado.real = ok;
+  $('#punto').className = 'punto ' + (ok ? 'ok' : (estado.clave ? 'error' : ''));
+  $('#textoConexion').textContent = ok ? 'conectado' : (estado.clave ? 'sin conexión' : 'modo demo');
+  $('#detalleConexion').textContent = texto;
+  $('#bannerDemo').classList.toggle('oculto', ok);
+}
+async function conectar() {
+  if (!estado.clave) { ponerConexion(false, 'sin clave: modo demo'); return false; }
+  $('#detalleConexion').textContent = 'conectando… (si el backend estaba dormido tarda unos segundos)';
+  try {
+    const s = await api('/salud-bd');
+    ponerConexion(true, `ok · build ${String(s.build).slice(0, 7)} · ${s.herramientas} herramientas`);
+    return true;
+  } catch (e) { ponerConexion(false, 'error: ' + e.message); return false; }
+}
+
+// ------------------------------------------------------------------ datos demo
+const DEMO_HERR = [
+  ['idealo', 'Idealo', 'comparadores', 'C'], ['google-shopping', 'Google Shopping (Serper)', 'comparadores', 'A'], ['geizhals', 'Geizhals', 'comparadores', 'C'], ['kelkoo', 'Kelkoo', 'comparadores', 'C'], ['geeknetic', 'Geeknetic', 'comparadores', 'C'],
+  ['amazon-es', 'Amazon.es', 'tiendas', 'D'], ['pccomponentes', 'PcComponentes', 'tiendas', 'C'], ['coolmod', 'Coolmod', 'tiendas', 'C'], ['ebay', 'eBay', 'tiendas', 'A'], ['aliexpress', 'AliExpress', 'tiendas', 'D'], ['mediamarkt', 'MediaMarkt', 'tiendas', 'C'], ['backmarket', 'Back Market', 'tiendas', 'C'], ['wallapop', 'Wallapop', 'tiendas', 'D'],
+  ['chollometro', 'Chollometro', 'historico', 'B'], ['camelcamelcamel', 'CamelCamelCamel', 'historico', 'D'],
+  ['perplexity', 'Perplexity', 'asistentes_ia', 'D'], ['chatgpt', 'ChatGPT', 'asistentes_ia', 'D'], ['gemini', 'Gemini', 'asistentes_ia', 'D'], ['claude', 'Claude', 'asistentes_ia', 'D'], ['copilot', 'Copilot', 'asistentes_ia', 'D'],
+  ['r-minipcs', 'r/MiniPCs', 'comunidades', 'D'], ['r-homeserver', 'r/HomeServer', 'comunidades', 'D'], ['servethehome', 'ServeTheHome', 'comunidades', 'D'], ['liliputing', 'Liliputing', 'comunidades', 'D'], ['notebookcheck', 'NotebookCheck', 'comunidades', 'D'], ['youtube', 'YouTube', 'comunidades', 'D'],
+].map(([slug, nombre, categoria, nivel], i) => ({ id: i + 1, slug, nombre, categoria, nivel, nivel_actual: nivel, url: 'https://' + slug + '.example', url_plantilla_busqueda: 'https://' + slug + '.example/buscar?q={q}', origen: 'predefinida', activa: true, participa: true, disponible: true, motivo: '', descripcion: '' }));
+const DEMO_PRODUCTOS = [
+  ['Beelink Mini S12 Pro Mini PC Intel N100 16GB DDR4 500GB SSD', 16, 500, 'Intel N100', 15, true, [['idealo', 189, 0, 'nuevo', 4.5], ['ebay', 179, 5, 'nuevo', 4.4], ['google-shopping', 199.99, 0, 'nuevo', 4.6]]],
+  ['GMKtec NucBox G3 Plus Intel N150 16GB 1TB fanless', 16, 1024, 'Intel N150', 12, true, [['pccomponentes', 229, 0, 'nuevo', 4.3], ['chollometro', 219, 0, 'nuevo', null]]],
+  ['Minisforum UN100L Mini PC N100 16GB 512GB', 16, 512, 'Intel N100', 15, true, [['google-shopping', 249, 4.99, 'nuevo', 4.4]]],
+  ['Lenovo ThinkCentre M720q Tiny i5-8400T 16GB 512GB reacondicionado', 16, 512, 'Intel Core i5-8400T', 35, true, [['ebay', 165, 0, 'reacondicionado', 4.8], ['backmarket', 189, 0, 'reacondicionado', 4.2]]],
+  ['ACEMAGIC S1 Mini PC Intel N95 16GB 512GB', 16, 512, 'Intel N95', 15, true, [['amazon-es', 209, 0, 'nuevo', 4.1]]],
+  ['Intel NUC 11 Essential Celeron N5105 8GB 256GB', 8, 256, 'Intel Celeron N5105', 10, true, [['idealo', 219, 0, 'nuevo', 4.0]]],
+  ['Chuwi LarkBox X Intel N100 12GB 512GB', 12, 512, 'Intel N100', 15, true, [['aliexpress', 149, 0, 'nuevo', 4.2], ['google-shopping', 169, 0, 'nuevo', 4.1]]],
+  ['Mini PC Celeron J4125 4GB 128GB', 4, 128, 'Intel Celeron J4125', 10, true, [['aliexpress', 119, 0, 'nuevo', 3.9]]],
+  ['Beelink SER5 AMD Ryzen 5 5560U 16GB 500GB', 16, 500, 'AMD Ryzen 5 5560U', 45, false, [['pccomponentes', 329, 0, 'nuevo', 4.5], ['ebay', 299, 8, 'nuevo', 4.3]]],
+  ['Minisforum UM790 Pro Ryzen 9 7940HS 32GB 1TB', 32, 1024, 'AMD Ryzen 9 7940HS', 65, false, [['pccomponentes', 649, 0, 'nuevo', 4.7]]],
+  ['HP EliteDesk 800 G4 Mini i5-8500T 8GB 256GB reacondicionado', 8, 256, 'Intel Core i5-8500T', 35, true, [['backmarket', 149, 0, 'reacondicionado', 4.3]]],
+  ['Bmax B4 Plus N100 16GB 512GB', 16, 512, 'Intel N100', 15, true, [['pccomponentes', 349, 0, 'nuevo', 4.0], ['amazon-es', 339, 0, 'nuevo', 4.0]]],
+].map(([nombre, ram, alm, cpu, tdp, apto, ofertas], i) => ({
+  producto_id: 100 + i, nombre, imagen_url: null, atributos: { ram_gb: ram, almacenamiento_gb: alm, cpu, tdp_w: tdp, apto_24_7: apto, apto_24_7_origen: 'heuristica', marca: nombre.split(' ')[0], formato: 'minipc' },
+  ofertas: ofertas.map(([fuente, precio, envio, est, val], j) => ({ id: 1000 + i * 10 + j, url: 'https://' + fuente + '.example/p/' + (i * 10 + j), titulo: nombre, precio, envio, precio_total: +(precio + envio).toFixed(2), estado_producto: est, fuente, fuente_nombre: (DEMO_HERR.find((h) => h.slug === fuente) || {}).nombre || fuente, valoracion: val, puntuacion: 0, explicacion: [], vigilada: 0 })),
+}));
+
+// ------------------------------------------------------------------ especificaciones
+function filaSpec(s = {}) {
+  const div = document.createElement('div'); div.className = 'spec' + (BLANDOS.has(s.clave) ? ' blando' : '');
+  const claves = Object.entries(ATRIBUTOS).map(([k, v]) => `<option value="${k}" ${k === s.clave ? 'selected' : ''}>${v[0]}</option>`).join('') + `<option value="fiable" ${s.clave === 'fiable' ? 'selected' : ''}>Fiable</option>`;
+  div.innerHTML = `<select class="clave" aria-label="Atributo">${claves}</select>
+    <select class="op" aria-label="Operador"><option value=">=">≥</option><option value="<=">≤</option><option value="=">=</option><option value="~">≈</option><option value="!=">≠</option></select>
+    <input class="valor" type="text" aria-label="Valor" placeholder="valor">
+    <select class="peso" aria-label="Peso"><option value="1">peso 1</option><option value="2">peso 2</option><option value="3">peso 3</option><option value="5">peso 5</option></select>
+    <button type="button" class="pequeno quitar" aria-label="Quitar">✕</button>`;
+  div.querySelector('.op').value = s.operador || '>=';
+  div.querySelector('.valor').value = s.valor === true ? 'sí' : (s.valor === false ? 'no' : (s.valor ?? ''));
+  div.querySelector('.peso').value = String(s.peso || 1);
+  div.querySelector('.quitar').onclick = () => div.remove();
+  div.querySelector('.clave').onchange = (e) => { div.classList.toggle('blando', BLANDOS.has(e.target.value)); };
+  $('#specs').appendChild(div);
+}
+function leerSpecs() {
+  return $$('#specs .spec').map((d) => {
+    const clave = $('.clave', d).value; const tipo = (ATRIBUTOS[clave] || ['', '', 'booleano'])[2];
+    let valor = $('.valor', d).value.trim(); if (!valor) return null;
+    if (tipo === 'numero') { valor = parseFloat(valor.replace(',', '.')); if (isNaN(valor)) return null; }
+    else if (tipo === 'booleano') valor = !/^(no|false|0)$/i.test(valor);
+    return { clave, operador: $('.op', d).value, valor, peso: parseFloat($('.peso', d).value), blando: BLANDOS.has(clave), unidad: (ATRIBUTOS[clave] || ['', ''])[1] };
+  }).filter(Boolean);
+}
+function ponerSpecs(specs) { $('#specs').innerHTML = ''; specs.forEach(filaSpec); }
+$('#btnAddSpec').onclick = () => filaSpec({ clave: 'ram_gb' });
+function casoMiniPC() {
+  $('#texto').value = 'Mini PC con 8 GB de RAM como mínimo y 500 GB de disco interno, para tenerlo encendido 24/7, entre 130 y 330 €';
+  ponerSpecs([{ clave: 'ram_gb', operador: '>=', valor: 8, peso: 3 }, { clave: 'almacenamiento_gb', operador: '>=', valor: 500, peso: 3 }, { clave: 'apto_24_7', operador: '=', valor: true, peso: 2 }]);
+  $('#precioMin').value = 130; $('#precioMax').value = 330; $('#estado').value = 'cualquiera';
+}
+$('#btnEjemplo').onclick = casoMiniPC;
+function validarRango() {
+  const a = parseFloat($('#precioMin').value), b = parseFloat($('#precioMax').value);
+  const mal = !isNaN(a) && !isNaN(b) && a > b; $('#errorRango').hidden = !mal; return !mal;
+}
+$('#precioMin').oninput = $('#precioMax').oninput = validarRango;
+
+// interpretación local (demo) por reglas
+function interpretarLocal(texto) {
+  const t = texto.toLowerCase(); const specs = [];
+  const ram = t.match(/(\d+)\s*gb\s*(?:de\s*)?(?:ram|memoria)/) || t.match(/ram\D{0,10}(\d+)\s*gb/); if (ram) specs.push({ clave: 'ram_gb', operador: '>=', valor: +ram[1], peso: 3 });
+  const alm = t.match(/(\d+)\s*(gb|tb)\s*(?:de\s*)?(?:disco|ssd|almacenamiento)/) || t.match(/(?:disco|ssd)\D{0,12}(\d+)\s*(gb|tb)/); if (alm) specs.push({ clave: 'almacenamiento_gb', operador: '>=', valor: alm[2] === 'tb' ? +alm[1] * 1024 : +alm[1], peso: 3 });
+  if (/24\s*\/\s*7|24x7|siempre encendido|servidor/.test(t)) specs.push({ clave: 'apto_24_7', operador: '=', valor: true, peso: 2, blando: true });
+  if (/silencios/.test(t)) specs.push({ clave: 'silencioso', operador: '=', valor: true, peso: 1, blando: true });
+  const pulg = t.match(/(\d{2})\s*(?:"|''|pulgadas)/); if (pulg) specs.push({ clave: 'pantalla_pulgadas', operador: '=', valor: +pulg[1], peso: 2 });
+  let precio_min = null, precio_max = null;
+  const entre = t.match(/entre\s*(\d+)\s*(?:y|-)\s*(\d+)/); const menos = t.match(/(?:menos de|máximo|max|hasta|por debajo de)\s*(\d+)/); const mas = t.match(/(?:más de|mínimo|desde)\s*(\d+)\s*€?/);
+  if (entre) { precio_min = +entre[1]; precio_max = +entre[2]; } else { if (menos) precio_max = +menos[1]; if (mas) precio_min = +mas[1]; }
+  const categoria = /mini\s*-?pc|nuc/.test(t) ? 'minipc' : /port[aá]til|laptop/.test(t) ? 'portatil' : /router/.test(t) ? 'router' : 'generica';
+  const estado = /reacondicionad/.test(t) ? 'reacondicionado' : /segunda mano|usado/.test(t) ? 'segunda_mano' : 'cualquiera';
+  const base = [categoria === 'minipc' ? 'mini pc' : categoria === 'portatil' ? 'portátil' : categoria === 'router' ? 'router' : texto.split(/\s+/).slice(0, 4).join(' '), ram ? ram[1] + 'gb' : '', alm ? alm[1] + alm[2] : ''].filter(Boolean).join(' ');
+  return { categoria, resumen: `${categoria === 'generica' ? 'Producto' : categoria} · ${specs.map((s) => (ATRIBUTOS[s.clave] || [s.clave])[0] + ' ' + s.operador + ' ' + (s.valor === true ? 'sí' : s.valor)).join(' · ') || 'sin especificaciones'} · ${precio_min != null || precio_max != null ? `${precio_min ?? '…'}–${precio_max ?? '…'} €` : 'sin rango de precio'} (interpretación local, sin IA)`, especificaciones: specs, precio_min, precio_max, estado, consulta_base: base, confianza: 0.5 };
+}
+function aplicarInterpretacion(inter, aviso) {
+  if (!inter) return;
+  if (inter.especificaciones && inter.especificaciones.length) ponerSpecs(inter.especificaciones);
+  if (inter.precio_min != null) $('#precioMin').value = inter.precio_min; if (inter.precio_max != null) $('#precioMax').value = inter.precio_max;
+  if (inter.estado) $('#estado').value = inter.estado;
+  const e = $('#entendido'); e.hidden = false;
+  e.innerHTML = `<b>Lo que he entendido:</b> ${esc(inter.resumen)}${inter.confianza != null ? ` <span class="chip">confianza ${Math.round(inter.confianza * 100)} %</span>` : ''}${aviso ? `<br><small>${esc(aviso)}</small>` : ''}<br><small>Corrige las especificaciones o el precio si no es lo que querías: lo que buscamos es lo que hay en el formulario.</small>`;
+  validarRango();
+}
+$('#btnInterpretar').onclick = async () => {
+  const texto = $('#texto').value.trim(); if (!texto) { toast('Escribe qué buscas'); return; }
+  $('#btnInterpretar').disabled = true;
+  try {
+    if (estado.real) {
+      const r = await api('/interpretar', { method: 'POST', body: JSON.stringify({ texto }) });
+      if (r.disponible && r.interpretacion) aplicarInterpretacion(r.interpretacion); else aplicarInterpretacion(interpretarLocal(texto), r.motivo || 'IA no disponible: interpretación local por reglas');
+    } else aplicarInterpretacion(interpretarLocal(texto), 'Modo demo: interpretación local por reglas. Con el backend conectado la hace Claude.');
+  } catch (e) { aplicarInterpretacion(interpretarLocal(texto), 'Error de IA (' + e.message + '): interpretación local'); }
+  $('#btnInterpretar').disabled = false;
+};
+
+// ------------------------------------------------------------------ herramientas
+function herramientasUsuarioDemo() { return almacen.get('herramientas', []); }
+async function cargarHerramientas() {
+  if (estado.real) {
+    try { const r = await api('/herramientas'); estado.herramientas = r.herramientas; }
+    catch (e) { toast('No se pudo cargar el catálogo: ' + e.message); estado.herramientas = DEMO_HERR.concat(herramientasUsuarioDemo()); }
+  } else {
+    const inactivas = new Set(almacen.get('inactivas', []));
+    estado.herramientas = DEMO_HERR.map((h) => ({ ...h, activa: !inactivas.has(h.slug) })).concat(herramientasUsuarioDemo());
+  }
+  pintarFuentes(); pintarHerramientas();
+}
+function pintarFuentes() {
+  const cont = $('#fuentes'); cont.innerHTML = '';
+  const marcadas = new Set(almacen.get('fuentes_marcadas', null) || estado.herramientas.filter((h) => h.activa && h.participa && h.nivel_actual !== 'D').map((h) => h.slug));
+  const grupos = {};
+  estado.herramientas.filter((h) => h.activa && h.participa).forEach((h) => (grupos[h.categoria] = grupos[h.categoria] || []).push(h));
+  Object.entries(grupos).forEach(([cat, hs]) => {
+    const g = document.createElement('div'); g.className = 'fuentes-grupo';
+    g.innerHTML = `<h3>${esc(CATEGORIAS[cat] || cat)}</h3>` + hs.map((h) => `<label><input type="checkbox" value="${esc(h.slug)}" ${marcadas.has(h.slug) ? 'checked' : ''}> ${esc(h.nombre)} <span class="chip nivel" title="nivel de integración">${esc(h.nivel_actual || h.nivel)}</span>${h.disponible === false ? `<span class="chip duda" title="${esc(h.motivo)}">sin clave</span>` : ''}</label>`).join('');
+    cont.appendChild(g);
+  });
+  cont.onchange = () => almacen.set('fuentes_marcadas', fuentesMarcadas());
+  const sel = $('#fFuente'); const actual = sel.value; sel.innerHTML = '<option value="">Todas</option>' + estado.herramientas.filter((h) => h.participa).map((h) => `<option value="${esc(h.slug)}">${esc(h.nombre)}</option>`).join(''); sel.value = actual;
+}
+function fuentesMarcadas() { return $$('#fuentes input:checked').map((i) => i.value); }
+$('#btnTodasFuentes').onclick = () => { const todas = $$('#fuentes input'); const alguna = todas.some((i) => !i.checked); todas.forEach((i) => (i.checked = alguna)); almacen.set('fuentes_marcadas', fuentesMarcadas()); };
+function pintarHerramientas() {
+  const filtro = $('#buscarHerr').value.trim().toLowerCase(); const cont = $('#listaHerramientas'); cont.innerHTML = '';
+  const grupos = {};
+  estado.herramientas.filter((h) => !filtro || (h.nombre + ' ' + h.slug + ' ' + (h.descripcion || '')).toLowerCase().includes(filtro)).forEach((h) => (grupos[h.categoria] = grupos[h.categoria] || []).push(h));
+  Object.entries(grupos).forEach(([cat, hs]) => {
+    const t = document.createElement('div'); t.className = 'tarjeta'; t.innerHTML = `<h2>${esc(CATEGORIAS[cat] || cat)} <small style="color:var(--suave);font-weight:400">${hs.length}</small></h2>`;
+    hs.forEach((h) => {
+      const d = document.createElement('div'); d.className = 'herr';
+      d.innerHTML = `<label class="interruptor" title="Activa / inactiva"><input type="checkbox" ${h.activa ? 'checked' : ''} aria-label="Activar ${esc(h.nombre)}"><span></span></label>
+        <div class="cuerpo"><b>${esc(h.nombre)} ${h.origen === 'usuario' ? '<span class="chip">Añadida por ti</span>' : ''} <span class="chip nivel">nivel ${esc(h.nivel_actual || h.nivel || '—')}</span> ${h.participa ? '' : '<span class="chip">no participa</span>'} ${h.disponible === false ? `<span class="chip duda">${esc(h.motivo)}</span>` : ''} ${h.universal_ok ? '<span class="chip ok">IA universal ok</span>' : ''}</b>
+        <small><a href="${esc(h.url)}" target="_blank" rel="noopener">${esc(h.url)}</a>${h.url_plantilla_busqueda ? ' · búsqueda: <code>' + esc(h.url_plantilla_busqueda) + '</code>' : ''}</small>
+        <small>${esc(h.descripcion || '')}</small>
+        <div class="acciones" style="margin-top:.3rem">${h.url_plantilla_busqueda ? `<button class="pequeno probar">Probar</button>` : ''}${h.origen === 'usuario' ? `<button class="pequeno editar">Editar</button><button class="pequeno borrar">Eliminar</button>` : ''}</div></div>`;
+      d.querySelector('.interruptor input').onchange = (e) => cambiarActiva(h, e.target.checked);
+      const pb = d.querySelector('.probar'); if (pb) pb.onclick = () => probarHerramienta(h);
+      const eb = d.querySelector('.editar'); if (eb) eb.onclick = () => abrirFormHerr(h);
+      const bb = d.querySelector('.borrar'); if (bb) bb.onclick = () => borrarHerramienta(h);
+      t.appendChild(d);
+    });
+    cont.appendChild(t);
+  });
+  if (!cont.children.length) cont.innerHTML = '<div class="vacio">Ninguna herramienta coincide.</div>';
+}
+$('#buscarHerr').oninput = pintarHerramientas;
+async function cambiarActiva(h, activa) {
+  h.activa = activa;
+  if (estado.real) { try { await api(`/herramientas/${h.id}/activa`, { method: 'PATCH', body: JSON.stringify({ activa }) }); } catch (e) { toast(e.message); } }
+  else if (h.origen === 'usuario') { almacen.set('herramientas', herramientasUsuarioDemo().map((x) => x.id === h.id ? { ...x, activa } : x)); }
+  else { const s = new Set(almacen.get('inactivas', [])); activa ? s.delete(h.slug) : s.add(h.slug); almacen.set('inactivas', [...s]); }
+  pintarFuentes();
+}
+function abrirFormHerr(h) {
+  $('#dlgHerrTitulo').textContent = h ? 'Editar herramienta' : 'Añadir herramienta';
+  $('#hId').value = h ? h.id : ''; $('#hNombre').value = h ? h.nombre : ''; $('#hCategoria').value = h ? (CATEGORIAS[h.categoria] ? h.categoria : 'otra') : 'tiendas'; $('#hUrl').value = h ? h.url : '';
+  $('#hPlantilla').value = h ? (h.url_plantilla_busqueda || '') : ''; $('#hTipo').value = h ? (h.tipo_acceso || 'web') : 'web'; $('#hCoste').value = h ? (h.coste || 'gratis') : 'gratis'; $('#hDesc').value = h ? (h.descripcion || '') : ''; $('#hJs').checked = !!(h && h.necesita_js);
+  $('#hError').hidden = true; abrir($('#dlgHerr'));
+}
+$('#btnNuevaHerr').onclick = () => abrirFormHerr(null);
+$('#hCancelar').onclick = () => $('#dlgHerr').close();
+$('#formHerr').onsubmit = async (e) => {
+  e.preventDefault();
+  const datos = { nombre: $('#hNombre').value.trim(), categoria: $('#hCategoria').value, url: $('#hUrl').value.trim(), url_plantilla_busqueda: $('#hPlantilla').value.trim() || null, tipo_acceso: $('#hTipo').value, coste: $('#hCoste').value, descripcion: $('#hDesc').value.trim(), activa: true, necesita_js: $('#hJs').checked };
+  const err = $('#hError');
+  if (!/^https?:\/\//.test(datos.url)) { err.textContent = 'La URL debe empezar por http:// o https://'; err.hidden = false; return; }
+  if (datos.url_plantilla_busqueda && !datos.url_plantilla_busqueda.includes('{q}')) { err.textContent = 'La URL de búsqueda debe contener {q}'; err.hidden = false; return; }
+  const id = $('#hId').value;
+  try {
+    if (estado.real) { await api(id ? `/herramientas/${id}` : '/herramientas', { method: id ? 'PUT' : 'POST', body: JSON.stringify(datos) }); }
+    else {
+      const lista = herramientasUsuarioDemo();
+      const slug = datos.nombre.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const h = { ...datos, id: id ? +id : Date.now(), slug: id ? lista.find((x) => x.id === +id).slug : slug, origen: 'usuario', nivel: 'D', nivel_actual: 'D', participa: !!datos.url_plantilla_busqueda, disponible: true };
+      almacen.set('herramientas', id ? lista.map((x) => x.id === +id ? h : x) : lista.concat([h]));
+    }
+    $('#dlgHerr').close(); toast(id ? 'Herramienta actualizada' : 'Herramienta añadida'); await cargarHerramientas();
+  } catch (ex) { err.textContent = ex.message; err.hidden = false; }
+};
+async function borrarHerramienta(h) {
+  if (!confirm(`¿Eliminar «${h.nombre}»?`)) return;
+  if (estado.real) { try { await api(`/herramientas/${h.id}`, { method: 'DELETE' }); } catch (e) { toast(e.message); return; } }
+  else almacen.set('herramientas', herramientasUsuarioDemo().filter((x) => x.id !== h.id));
+  toast('Eliminada'); await cargarHerramientas();
+}
+async function probarHerramienta(h) {
+  if (!estado.real) { mostrarInfo('Probar herramienta', `<p>En modo demo no se consulta nada. Con el backend conectado, «Probar» lanza una búsqueda de prueba solo en <b>${esc(h.nombre)}</b> y muestra el nivel alcanzado (D enlace, C IA universal, B/A adaptador) y hasta 3 ofertas de ejemplo.</p>`); return; }
+  mostrarInfo('Probando ' + h.nombre, '<p>Consultando la fuente… (puede tardar unos segundos)</p>');
+  try {
+    const r = await api(`/herramientas/${h.id}/probar`, { method: 'POST', body: JSON.stringify({ texto: 'mini pc 16gb' }) });
+    $('#dlgInfoCuerpo').innerHTML = `<p>Nivel alcanzado: <span class="chip nivel">${esc(r.nivel || '—')}</span> · ${r.ok ? `<span class="chip ok">ok · ${r.n} resultados</span>` : `<span class="chip mal">${esc(r.motivo)}</span>`}</p>` + (r.muestra || []).map((o) => `<div class="aviso-inline" style="margin:.3rem 0"><b>${esc(o.titulo)}</b><br>${o.precio != null ? eur(o.precio) + ' · ' : ''}<a href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.url.slice(0, 80))}</a></div>`).join('');
+    await cargarHerramientas();
+  } catch (e) { $('#dlgInfoCuerpo').innerHTML = `<p class="aviso-inline error">${esc(e.message)}</p>`; }
+}
+function mostrarInfo(titulo, html) { $('#dlgInfoTitulo').textContent = titulo; $('#dlgInfoCuerpo').innerHTML = html; abrir($('#dlgInfo')); }
+$('#dlgInfoCerrar').onclick = () => $('#dlgInfo').close();
+
+// ------------------------------------------------------------------ búsqueda
+$('#btnBuscar').onclick = () => lanzarBusqueda(false);
+$('#btnRelanzar').onclick = () => lanzarBusqueda(true);
+function peticionActual(sinCache) {
+  const pm = parseFloat($('#precioMin').value), px = parseFloat($('#precioMax').value);
+  return { texto: $('#texto').value.trim() || null, especificaciones: leerSpecs(), precio_min: isNaN(pm) ? null : pm, precio_max: isNaN(px) ? null : px, estado: $('#estado').value, fuentes: fuentesMarcadas(), interpretar: true, usar_cache: !sinCache };
+}
+async function lanzarBusqueda(sinCache) {
+  if (!validarRango()) { toast('Revisa el rango de precios'); return; }
+  const p = peticionActual(sinCache);
+  if (!p.texto && !p.especificaciones.length) { toast('Escribe qué buscas o añade una especificación'); return; }
+  if (!p.fuentes.length) { toast('Marca al menos una fuente'); return; }
+  estado.comparar.clear(); actualizarBotonComparar();
+  cambiarPestana('resultados');
+  if (estado.real) {
+    try {
+      const r = await api('/busquedas', { method: 'POST', body: JSON.stringify(p) });
+      estado.busquedaId = r.id; location.hash = 'b=' + r.id;
+      if (r.interpretacion) aplicarInterpretacion(r.interpretacion);
+      sondear();
+    } catch (e) { $('#resumenConsulta').innerHTML = `<span class="aviso-inline error">${esc(e.message)}</span>`; }
+  } else busquedaDemo(p);
+}
+function sondear() {
+  clearInterval(estado.sondeo);
+  const tick = async () => {
+    try {
+      const b = await api(`/busquedas/${estado.busquedaId}`);
+      estado.busqueda = b; pintarProgreso(b);
+      await cargarResultados();
+      if (b.estado === 'terminada' || b.estado === 'error') { clearInterval(estado.sondeo); if (b.estado === 'error') toast('La búsqueda terminó con error: ' + (b.error || '')); cargarHistorial(); }
+    } catch (e) { clearInterval(estado.sondeo); toast('Error consultando la búsqueda: ' + e.message); }
+  };
+  tick(); estado.sondeo = setInterval(tick, 1500);
+}
+function pintarProgreso(b) {
+  const total = b.progreso ? b.progreso.total : 0, hechas = b.progreso ? b.progreso.terminadas : 0;
+  $('#barra > i').style.width = total ? Math.round(100 * hechas / total) + '%' : '0';
+  const specs = (b.especificaciones || []).map((s) => `${(ATRIBUTOS[s.clave] || [s.clave])[0]} ${s.operador} ${s.valor === true ? 'sí' : s.valor}${s.unidad || ''}`).join(' · ');
+  $('#resumenConsulta').innerHTML = `<b>${esc(b.texto || (b.interpretacion && b.interpretacion.consulta_base) || 'búsqueda')}</b>${specs ? ' · ' + esc(specs) : ''}${b.precio_min != null || b.precio_max != null ? ` · ${b.precio_min ?? '…'}–${b.precio_max ?? '…'} €` : ''} · <span class="chip ${b.estado === 'terminada' ? 'ok' : b.estado === 'error' ? 'mal' : ''}">${esc(b.estado)}</span> ${hechas}/${total} fuentes${b.interpretacion && b.interpretacion.resumen ? `<br><small>IA: ${esc(b.interpretacion.resumen)}</small>` : ''}`;
+  const iconos = { ok: 'ok', degradada: 'duda', omitida: '', error: 'mal', pendiente: '', en_curso: '' };
+  $('#progreso').innerHTML = (b.fuentes || []).map((f) => `<span class="chip ${iconos[f.estado] || ''}" title="${esc(f.error || f.estado)}${f.ms ? ' · ' + f.ms + ' ms' : ''}${f.desde_cache ? ' · caché' : ''}">${f.estado === 'en_curso' ? '⏳ ' : f.estado === 'pendiente' ? '· ' : ''}${esc(f.nombre)} ${f.nivel_usado ? '<b>' + esc(f.nivel_usado) + '</b>' : ''}${f.estado === 'ok' || f.estado === 'degradada' ? ' ' + f.n_ofertas : f.estado === 'error' ? ' ✗' : ''}</span>`).join('');
+}
+function filtrosActuales() {
+  const n = (id) => { const v = parseFloat($(id).value); return isNaN(v) ? null : v; };
+  return { precio_min: n('#fPrecioMin'), precio_max: n('#fPrecioMax'), ram_min: n('#fRam'), almacenamiento_min: n('#fAlm'), estado: $('#fEstado').value || null, orden: $('#fOrden').value, fuentes: $('#fFuente').value || null, apto_24_7: $('#f247').checked, fuera_rango: $('#fFuera').checked };
+}
+let filtroT; const filtrar = () => { clearTimeout(filtroT); filtroT = setTimeout(cargarResultados, 250); };
+['#fPrecioMin', '#fPrecioMax', '#fRam', '#fAlm', '#fEstado', '#fOrden', '#fFuente', '#f247', '#fFuera'].forEach((s) => { $(s).onchange = filtrar; $(s).oninput = filtrar; });
+$('#btnLimpiar').onclick = () => { ['#fPrecioMin', '#fPrecioMax'].forEach((s) => ($(s).value = '')); ['#fRam', '#fAlm', '#fEstado', '#fFuente'].forEach((s) => ($(s).value = '')); $('#fOrden').value = 'puntuacion'; $('#f247').checked = false; $('#fFuera').checked = false; cargarResultados(); };
+async function cargarResultados() {
+  if (!estado.busquedaId) return;
+  if (estado.real) {
+    const f = filtrosActuales(); const q = new URLSearchParams();
+    Object.entries(f).forEach(([k, v]) => { if (v !== null && v !== false && v !== '') q.set(k, v); });
+    try { estado.resultados = await api(`/busquedas/${estado.busquedaId}/resultados?` + q.toString() + '&limite=200'); } catch (e) { toast(e.message); return; }
+  } else estado.resultados = resultadosDemo();
+  pintarResultados();
+}
+// puntuación local (demo) idéntica en espíritu a la del backend
+function puntuarLocal(specs, at) {
+  if (!specs.length) return [100, []];
+  let peso = 0, acum = 0; const ex = [];
+  specs.forEach((s) => {
+    const v = at[s.clave]; const tipo = (ATRIBUTOS[s.clave] || ['', '', 'booleano'])[2]; let p = .5, conocido = v != null, texto = (ATRIBUTOS[s.clave] || [s.clave])[0] + ': ';
+    if (!conocido) texto += 'sin datos';
+    else if (tipo === 'numero') { const n = +v, o = +s.valor; texto += `${n}${s.unidad || ''} (pedido ${s.operador} ${o})`; p = s.operador === '>=' ? (n >= o ? 1 : Math.max(0, n / o) * .6) : s.operador === '<=' ? (n <= o ? 1 : Math.max(0, o / n) * .6) : (Math.abs(n - o) < 1e-6 ? 1 : 0); }
+    else if (tipo === 'booleano') { p = (!!v) === (s.valor !== false) ? 1 : 0; texto += (v ? 'sí' : 'no') + (at[s.clave + '_origen'] === 'heuristica' ? ' (heurística)' : ''); }
+    else { p = String(v).toLowerCase().includes(String(s.valor).toLowerCase()) ? 1 : 0; texto += v; }
+    peso += s.peso || 1; acum += p * (s.peso || 1); ex.push({ clave: s.clave, cumple: p >= .99, parcial: p, texto, conocido, blando: !!s.blando });
+  });
+  return [Math.round(1000 * acum / peso) / 10, ex];
+}
+function busquedaDemo(p) {
+  estado.busquedaId = 'demo'; estado.demoPeticion = p;
+  const fuentes = estado.herramientas.filter((h) => p.fuentes.includes(h.slug)).map((h) => ({ slug: h.slug, nombre: h.nombre, estado: 'pendiente', n_ofertas: 0, nivel_usado: h.nivel_actual, ms: null }));
+  estado.busqueda = { id: 'demo', texto: p.texto, especificaciones: p.especificaciones, precio_min: p.precio_min, precio_max: p.precio_max, estado: 'en_curso', fuentes, progreso: { total: fuentes.length, terminadas: 0 }, interpretacion: null };
+  pintarProgreso(estado.busqueda); $('#listaResultados').innerHTML = '<div class="vacio">Consultando fuentes (simulado)…</div>';
+  let i = 0;
+  const paso = () => {
+    if (i < fuentes.length) {
+      const f = fuentes[i++]; const tiene = DEMO_PRODUCTOS.some((pr) => pr.ofertas.some((o) => o.fuente === f.slug));
+      f.estado = f.nivel_usado === 'D' ? 'ok' : (tiene ? 'ok' : 'omitida'); f.n_ofertas = f.nivel_usado === 'D' ? 1 : DEMO_PRODUCTOS.reduce((n, pr) => n + pr.ofertas.filter((o) => o.fuente === f.slug).length, 0); f.ms = 300 + Math.round(Math.random() * 900);
+      estado.busqueda.progreso.terminadas = i; pintarProgreso(estado.busqueda); cargarResultados(); setTimeout(paso, 1500 / Math.max(fuentes.length, 1));
+    } else { estado.busqueda.estado = 'terminada'; pintarProgreso(estado.busqueda); cargarResultados(); }
+  };
+  setTimeout(paso, 200);
+}
+function resultadosDemo() {
+  const p = estado.demoPeticion; const f = filtrosActuales(); const hechas = new Set(estado.busqueda.fuentes.filter((x) => x.estado !== 'pendiente').map((x) => x.slug));
+  const enlaces = estado.busqueda.fuentes.filter((x) => x.nivel_usado === 'D' && hechas.has(x.slug)).map((x) => { const h = estado.herramientas.find((y) => y.slug === x.slug); return { id: x.slug, url: (h.url_plantilla_busqueda || '').replace('{q}', encodeURIComponent(p.texto || 'mini pc')), titulo: 'Buscar en ' + x.nombre, fuente: x.slug, fuente_nombre: x.nombre }; });
+  const pmin = f.precio_min ?? (f.fuera_rango ? null : p.precio_min), pmax = f.precio_max ?? (f.fuera_rango ? null : p.precio_max);
+  let productos = DEMO_PRODUCTOS.map((pr) => {
+    const ofertas = pr.ofertas.filter((o) => hechas.has(o.fuente) && p.fuentes.includes(o.fuente)).filter((o) => (pmin == null || o.precio_total >= pmin) && (pmax == null || o.precio_total <= pmax)).filter((o) => !f.fuentes || o.fuente === f.fuentes).filter((o) => !f.estado || o.estado_producto === f.estado || o.estado_producto === 'desconocido');
+    if (!ofertas.length) return null;
+    const [punt, ex] = puntuarLocal(p.especificaciones, pr.atributos);
+    return { ...pr, ofertas: ofertas.map((o) => ({ ...o, puntuacion: punt, explicacion: ex })).sort((a, b) => a.precio_total - b.precio_total), mejor_precio: Math.min(...ofertas.map((o) => o.precio_total)), n_tiendas: new Set(ofertas.map((o) => o.fuente)).size, puntuacion: punt, explicacion: ex, valoracion: Math.max(...ofertas.map((o) => o.valoracion || 0)) || null };
+  }).filter(Boolean).filter((g) => (f.ram_min == null || (g.atributos.ram_gb || 0) >= f.ram_min) && (f.almacenamiento_min == null || (g.atributos.almacenamiento_gb || 0) >= f.almacenamiento_min) && (!f.apto_24_7 || g.atributos.apto_24_7));
+  const ord = { puntuacion: (a, b) => b.puntuacion - a.puntuacion || a.mejor_precio - b.mejor_precio, precio_asc: (a, b) => a.mejor_precio - b.mejor_precio, precio_desc: (a, b) => b.mejor_precio - a.mejor_precio, valoracion: (a, b) => (b.valoracion || 0) - (a.valoracion || 0), mejor_relacion: (a, b) => b.puntuacion / b.mejor_precio - a.puntuacion / a.mejor_precio };
+  productos.sort(ord[f.orden] || ord.puntuacion);
+  const todas = DEMO_PRODUCTOS.flatMap((pr) => pr.ofertas.filter((o) => hechas.has(o.fuente) && p.fuentes.includes(o.fuente)));
+  const precios = todas.map((o) => o.precio_total).sort((a, b) => a - b);
+  return { total_ofertas: todas.length, ofertas_filtradas: productos.reduce((n, g) => n + g.ofertas.length, 0), total_productos: productos.length, productos, enlaces, facetas: { total: todas.length, fuentes: Object.fromEntries([...new Set(todas.map((o) => o.fuente))].map((s) => [s, todas.filter((o) => o.fuente === s).length])), apto_24_7: DEMO_PRODUCTOS.filter((pr) => pr.atributos.apto_24_7).length, precio: { min: precios[0], max: precios[precios.length - 1], mediana: precios[Math.floor(precios.length / 2)] } } };
+}
+function pintarResultados() {
+  const r = estado.resultados; if (!r) return;
+  $('#nResultados').hidden = false; $('#nResultados').textContent = r.total_productos;
+  const fac = r.facetas || {};
+  $('#facetas').innerHTML = [`<span class="chip">${r.ofertas_filtradas}/${r.total_ofertas} ofertas</span>`, `<span class="chip">${r.total_productos} productos</span>`, fac.precio && fac.precio.min != null ? `<span class="chip">de ${eur(fac.precio.min)} a ${eur(fac.precio.max)} · mediana ${eur(fac.precio.mediana)}</span>` : '', fac.apto_24_7 ? `<span class="chip">${fac.apto_24_7} aptos 24/7</span>` : ''].concat(Object.entries(fac.fuentes || {}).map(([s, n]) => `<span class="chip">${esc(s)}: ${n}</span>`)).join('');
+  const cont = $('#listaResultados'); cont.innerHTML = '';
+  if (!r.productos.length) { cont.innerHTML = `<div class="tarjeta vacio">${r.total_ofertas ? 'Ningún resultado cumple los filtros. <br><button id="btnLimpiar2" class="pequeno" style="margin-top:.6rem">Limpiar filtros</button>' : (estado.busqueda && estado.busqueda.estado === 'terminada' ? 'Ninguna fuente devolvió ofertas con precio. Prueba con otras fuentes o usa los enlaces directos.' : 'Esperando resultados…')}</div>`; const b = $('#btnLimpiar2'); if (b) b.onclick = () => $('#btnLimpiar').click(); }
+  r.productos.forEach((g) => {
+    const t = document.createElement('article'); t.className = 'tarjeta';
+    const at = g.atributos || {}; const chips = ['ram_gb', 'almacenamiento_gb', 'cpu', 'tdp_w', 'pantalla_pulgadas', 'apto_24_7', 'fanless'].filter((k) => at[k] != null).map((k) => `<span class="chip ${k === 'apto_24_7' ? (at[k] ? 'ok' : 'mal') : ''}" title="${esc((ATRIBUTOS[k] || [k])[0])}${at[k + '_origen'] ? ' (' + at[k + '_origen'] + ')' : ''}">${k === 'apto_24_7' ? (at[k] ? '24/7 ✓' : '24/7 ✗') : k === 'fanless' ? 'sin ventilador' : esc(at[k]) + esc((ATRIBUTOS[k] || ['', ''])[1])}</span>`).join('');
+    const ex = (g.explicacion || []).map((e) => `<li class="${e.cumple ? '' : e.conocido ? 'no' : 'duda'}">${esc(e.texto)}</li>`).join('');
+    t.innerHTML = `<div class="producto">${g.imagen_url ? `<img src="${esc(g.imagen_url)}" alt="" loading="lazy">` : '<div class="sinimg">sin imagen</div>'}<div>
+      <h3>${esc(g.nombre)}</h3>
+      <div class="chips">${chips}</div>
+      <div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;margin-top:.4rem"><span class="precio">${eur(g.mejor_precio)}</span><span style="color:var(--suave)">mejor precio · ${g.n_tiendas} ${g.n_tiendas === 1 ? 'tienda' : 'tiendas'}</span><span class="puntuacion" title="cumplimiento de las especificaciones">${Math.round(g.puntuacion)} pts</span>${g.valoracion ? `<span style="color:var(--suave)">★ ${g.valoracion.toFixed(1)}</span>` : ''}</div>
+      ${ex ? `<ul class="explicacion">${ex}</ul>` : ''}
+      <ul class="ofertas">${g.ofertas.map((o) => `<li><span class="t"><a href="${esc(o.url)}" target="_blank" rel="noopener">${esc(o.fuente_nombre)}</a> · ${esc(o.estado_producto || '')}${o.vendedor ? ' · ' + esc(o.vendedor) : ''}</span><b>${eur(o.precio_total)}</b>${o.envio ? `<small>(+${eur(o.envio)} envío)</small>` : ''}<button class="pequeno historico" data-id="${o.id}">Histórico</button><button class="pequeno alerta" data-id="${o.id}" data-precio="${o.precio_total}">Avisar si baja</button></li>`).join('')}</ul>
+      <div class="acciones"><label style="display:inline-flex;gap:.35rem;align-items:center;color:var(--texto);margin:0"><input type="checkbox" class="cmp" ${estado.comparar.has(g.producto_id) ? 'checked' : ''}> Comparar</label><button class="pequeno informe">¿Aguanta 24/7?</button></div>
+    </div></div>`;
+    t.querySelector('.cmp').onchange = (e) => { e.target.checked ? estado.comparar.add(g.producto_id) : estado.comparar.delete(g.producto_id); if (estado.comparar.size > 4) { estado.comparar.delete(g.producto_id); e.target.checked = false; toast('Máximo 4 productos'); } actualizarBotonComparar(); };
+    t.querySelector('.informe').onclick = () => verInforme(g);
+    $$('.historico', t).forEach((b) => (b.onclick = () => verHistorico(+b.dataset.id, g)));
+    $$('.alerta', t).forEach((b) => (b.onclick = () => crearAlertaPrecio(+b.dataset.id, +b.dataset.precio)));
+    cont.appendChild(t);
+  });
+  $('#tarjetaEnlaces').hidden = !(r.enlaces && r.enlaces.length);
+  $('#enlaces').innerHTML = (r.enlaces || []).map((e) => `<a class="chip" href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.fuente_nombre)} ↗</a>`).join('');
+}
+function actualizarBotonComparar() { const b = $('#btnComparar'); b.disabled = estado.comparar.size < 2; b.textContent = `Comparar (${estado.comparar.size})`; }
+
+// ------------------------------------------------------------------ histórico, informes, comparador, alertas
+function graficoSVG(serie) {
+  if (!serie.length) return '<p class="aviso-inline">Sin puntos todavía. El histórico crece con cada búsqueda repetida y con la vigilancia diaria.</p>';
+  const W = 600, H = 180, m = 28; const vals = serie.map((p) => p.total); const min = Math.min(...vals), max = Math.max(...vals); const rango = max - min || 1;
+  const x = (i) => m + (serie.length === 1 ? (W - 2 * m) / 2 : i * (W - 2 * m) / (serie.length - 1)); const y = (v) => H - m - (v - min) * (H - 2 * m) / rango;
+  const puntos = serie.map((p, i) => `${x(i)},${y(p.total)}`).join(' ');
+  return `<div class="grafico"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolución del precio"><polyline fill="none" stroke="var(--acento)" stroke-width="2.5" points="${puntos}"/>${serie.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.total)}" r="3.5" fill="var(--acento)"><title>${esc(p.fecha.slice(0, 10))}: ${eur(p.total)}</title></circle>`).join('')}<text x="${m}" y="${H - 6}" font-size="11" fill="var(--suave)">${esc(serie[0].fecha.slice(0, 10))}</text><text x="${W - m}" y="${H - 6}" font-size="11" text-anchor="end" fill="var(--suave)">${esc(serie[serie.length - 1].fecha.slice(0, 10))}</text><text x="${m}" y="14" font-size="11" fill="var(--suave)">máx ${eur(max)}</text><text x="${W - m}" y="14" font-size="11" text-anchor="end" fill="var(--suave)">mín ${eur(min)}</text></svg></div>`;
+}
+async function verHistorico(oid, g) {
+  if (!estado.real) {
+    const o = g.ofertas.find((x) => x.id === oid); const hoy = Date.now(); const serie = [30, 20, 10, 0].map((d, i) => ({ fecha: new Date(hoy - d * 864e5).toISOString(), total: +(o.precio_total * (1 + [.12, .05, .08, 0][i])).toFixed(2) }));
+    mostrarInfo('Histórico (demo) · ' + o.fuente_nombre, graficoSVG(serie) + `<p><span class="chip ok">buen precio</span> en el mínimo de los últimos 30 días (datos de ejemplo)</p>`); return;
+  }
+  mostrarInfo('Histórico', '<p>Cargando…</p>');
+  try {
+    const h = await api(`/ofertas/${oid}/historico`);
+    const v = { buen_precio: 'ok', normal: '', caro: 'mal', sin_datos: 'duda' }[h.veredicto] || '';
+    $('#dlgInfoTitulo').textContent = 'Histórico · ' + h.oferta.fuente_nombre;
+    $('#dlgInfoCuerpo').innerHTML = graficoSVG(h.serie) + `<p><span class="chip ${v}">${esc(h.veredicto.replace('_', ' '))}</span> ${esc(h.motivo)} · actual ${eur(h.actual)} · mínimo ${eur(h.minimo)} · mediana ${eur(h.mediana)} · ${h.n_comparables} comparables en otras tiendas</p><p><a href="${esc(h.oferta.url)}" target="_blank" rel="noopener">${esc(h.oferta.titulo)}</a></p>`;
+  } catch (e) { $('#dlgInfoCuerpo').innerHTML = `<p class="aviso-inline error">${esc(e.message)}</p>`; }
+}
+async function verInforme(g) {
+  if (!estado.real) { mostrarInfo('¿Aguanta 24/7? (demo)', `<p><span class="chip ${g.atributos.apto_24_7 ? 'ok' : 'mal'}">${g.atributos.apto_24_7 ? 'apto' : 'no apto'}</span> por heurística (TDP ${g.atributos.tdp_w} W${g.atributos.fanless ? ', sin ventilador' : ''}). Con el backend conectado, el Investigador busca en ServeTheHome, NotebookCheck y r/MiniPCs y devuelve un veredicto con citas.</p>`); return; }
+  mostrarInfo('¿Aguanta 24/7? · ' + g.nombre, '<p>Buscando informe…</p>');
+  const pintar = (r) => {
+    if (!r.informe) { $('#dlgInfoCuerpo').innerHTML = `<p>No hay informe todavía.</p><div class="acciones"><button id="btnGenerarInforme" class="primario">Investigar con IA (usa web_search)</button></div>`; $('#btnGenerarInforme').onclick = () => generarInforme(g); return; }
+    const i = r.informe; const v = { apto: 'ok', no_apto: 'mal', dudoso: 'duda' }[i.veredicto] || '';
+    $('#dlgInfoCuerpo').innerHTML = `<p><span class="chip ${v}">${esc(i.veredicto.replace('_', ' '))}</span> confianza ${Math.round(i.confianza * 100)} %${i.consumo_w ? ` · consumo ≈ ${i.consumo_w} W` : ''}${i.ruido ? ` · ruido: ${esc(i.ruido)}` : ''}</p><p>${esc(i.resumen)}</p><ul>${(i.motivos || []).map((m) => `<li>${esc(m)}</li>`).join('')}</ul><h3 style="font-size:.9rem;margin:.6rem 0 .2rem">Fuentes</h3><ul class="citas">${(i.citas || []).map((c) => `<li><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.titulo || c.url)}</a>${c.cita ? `<br><small>«${esc(c.cita)}»</small>` : ''}</li>`).join('') || '<li>sin citas</li>'}</ul><small style="color:var(--suave)">${r.creado ? 'generado ' + esc(r.creado.slice(0, 16).replace('T', ' ')) + ' · ' : ''}${esc(r.modelo || '')}</small><div class="acciones"><button id="btnGenerarInforme" class="pequeno">Volver a investigar</button></div>`;
+    $('#btnGenerarInforme').onclick = () => generarInforme(g, true);
+  };
+  try { pintar(await api(`/productos/${g.producto_id}/informe?requisito=24x7`)); } catch (e) { $('#dlgInfoCuerpo').innerHTML = `<p class="aviso-inline error">${esc(e.message)}</p>`; }
+  async function generarInforme(g, forzar) {
+    $('#dlgInfoCuerpo').innerHTML = '<p>Investigando en reviews y comunidades… (30–90 s)</p>';
+    try { pintar(await api(`/productos/${g.producto_id}/informe?requisito=24x7${forzar ? '&forzar=true' : ''}`, { method: 'POST' })); await cargarResultados(); } catch (e) { $('#dlgInfoCuerpo').innerHTML = `<p class="aviso-inline error">${esc(e.message)}</p>`; }
+  }
+}
+$('#btnComparar').onclick = async () => {
+  const ids = [...estado.comparar]; const productos = (estado.resultados.productos || []).filter((g) => ids.includes(g.producto_id));
+  const tabla = (filas) => `<div style="overflow-x:auto"><table class="comparar"><thead><tr><th></th>${productos.map((p) => `<th>${esc(p.nombre.slice(0, 60))}</th>`).join('')}</tr></thead><tbody>${filas.map((f) => `<tr><th>${esc(f.etiqueta)}</th>${productos.map((p) => `<td>${f.valores[p.producto_id] != null ? (f.atributo === 'mejor_precio' ? eur(f.valores[p.producto_id]) : esc(f.valores[p.producto_id] === true ? 'sí' : f.valores[p.producto_id] === false ? 'no' : f.valores[p.producto_id]) + esc(f.unidad || '')) : '—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const local = () => { const claves = [...new Set(productos.flatMap((p) => Object.keys(p.atributos).filter((k) => ATRIBUTOS[k])))]; return [{ atributo: 'mejor_precio', etiqueta: 'Mejor precio', valores: Object.fromEntries(productos.map((p) => [p.producto_id, p.mejor_precio])) }].concat(claves.map((k) => ({ atributo: k, etiqueta: ATRIBUTOS[k][0], unidad: ATRIBUTOS[k][1], valores: Object.fromEntries(productos.map((p) => [p.producto_id, p.atributos[k]])) }))); };
+  mostrarInfo('Comparar', tabla(local()) + (estado.real ? '<p>Pidiendo pros y contras a la IA…</p>' : '<p class="aviso-inline">Con el backend conectado, la IA añade pros, contras y una recomendación.</p>'));
+  if (!estado.real) return;
+  try {
+    const r = await api('/comparar', { method: 'POST', body: JSON.stringify({ producto_ids: ids, criterios: $('#texto').value.trim() }) });
+    const filas = r.tabla.map((f) => ({ ...f, valores: Object.fromEntries(Object.entries(f.valores).map(([k, v]) => [+k, v])) }));
+    let html = tabla(filas);
+    if (r.ia) { html += `<p><b>Recomendación:</b> ${esc(r.ia.recomendacion)}</p>` + productos.map((p) => { const pc = (r.ia.pros_contras || {})[String(p.producto_id)] || (r.ia.pros_contras || {})[p.producto_id]; return pc ? `<div class="aviso-inline" style="margin:.3rem 0"><b>${esc(p.nombre.slice(0, 60))}</b>${r.ia.ganador_id === p.producto_id ? ' <span class="chip ok">recomendado</span>' : ''}<br>✚ ${pc.pros.map(esc).join(' · ')}<br>− ${pc.contras.map(esc).join(' · ')}</div>` : ''; }).join(''); }
+    else html += `<p class="aviso-inline">${esc(r.ia_error || 'IA no disponible: solo tabla.')}</p>`;
+    $('#dlgInfoCuerpo').innerHTML = html;
+  } catch (e) { $('#dlgInfoCuerpo').innerHTML += `<p class="aviso-inline error">${esc(e.message)}</p>`; }
+};
+async function crearAlertaPrecio(oid, precio) {
+  const v = prompt('Avisar por Telegram cuando el precio total baje de (€):', String(Math.floor(precio * 0.9))); if (v == null) return;
+  const umbral = parseFloat(v.replace(',', '.')); if (isNaN(umbral)) { toast('Precio no válido'); return; }
+  if (!estado.real) { const l = almacen.get('alertas', []); l.push({ id: Date.now(), tipo: 'precio_objetivo', oferta_id: oid, umbral, creada: new Date().toISOString(), activa: true, oferta_titulo: 'oferta ' + oid }); almacen.set('alertas', l); toast('Alerta guardada (demo)'); cargarAlertas(); return; }
+  try { await api('/alertas', { method: 'POST', body: JSON.stringify({ tipo: 'precio_objetivo', oferta_id: oid, umbral }) }); toast('Alerta creada'); cargarAlertas(); } catch (e) { toast(e.message); }
+}
+$('#btnAlertaBusqueda').onclick = async () => {
+  if (!estado.busquedaId) { toast('Primero busca algo'); return; }
+  if (!estado.real) { const l = almacen.get('alertas', []); l.push({ id: Date.now(), tipo: 'nueva_oferta', busqueda_id: 'demo', umbral: 80, creada: new Date().toISOString(), activa: true, busqueda_texto: $('#texto').value }); almacen.set('alertas', l); toast('Alerta guardada (demo)'); cargarAlertas(); return; }
+  try { await api('/alertas', { method: 'POST', body: JSON.stringify({ tipo: 'nueva_oferta', busqueda_id: estado.busquedaId, umbral: 80 }) }); toast('Te avisaré de ofertas nuevas con ≥ 80 puntos'); cargarAlertas(); } catch (e) { toast(e.message); }
+};
+async function cargarAlertas() {
+  let alertas = [];
+  if (estado.real) { try { alertas = (await api('/alertas')).alertas; } catch (e) { $('#listaAlertas').innerHTML = `<div class="tarjeta aviso-inline error">${esc(e.message)}</div>`; return; } } else alertas = almacen.get('alertas', []);
+  const c = $('#listaAlertas');
+  if (!alertas.length) { c.innerHTML = '<div class="tarjeta vacio">No hay alertas.</div>'; return; }
+  c.innerHTML = '<div class="tarjeta">' + alertas.map((a) => `<div class="herr"><div class="cuerpo"><b>${a.tipo === 'precio_objetivo' ? '💶 Precio objetivo ' + eur(a.umbral) : '🆕 Nuevas ofertas (≥ ' + (a.umbral || 80) + ' pts)'}</b><small>${esc(a.oferta_titulo || a.busqueda_texto || a.busqueda_id || '')}${a.oferta_precio != null ? ' · ahora ' + eur(a.oferta_precio) : ''}</small><small>creada ${esc(String(a.creada).slice(0, 16).replace('T', ' '))}${a.ultimo_disparo ? ' · último aviso ' + esc(String(a.ultimo_disparo).slice(0, 16).replace('T', ' ')) : ''}</small></div><button class="pequeno" data-id="${a.id}">Eliminar</button></div>`).join('') + '</div>';
+  $$('#listaAlertas button').forEach((b) => (b.onclick = async () => { if (estado.real) { try { await api(`/alertas/${b.dataset.id}`, { method: 'DELETE' }); } catch (e) { toast(e.message); return; } } else almacen.set('alertas', almacen.get('alertas', []).filter((a) => String(a.id) !== b.dataset.id)); cargarAlertas(); }));
+}
+
+// ------------------------------------------------------------------ compartir, CSV, historial, estado
+$('#btnCompartir').onclick = async () => {
+  if (!estado.busquedaId) { toast('Primero busca algo'); return; }
+  const url = location.origin + location.pathname + (estado.real ? '#b=' + estado.busquedaId : '#q=' + encodeURIComponent($('#texto').value.trim()));
+  try { await navigator.clipboard.writeText(url); toast('Enlace copiado'); } catch { prompt('Copia el enlace:', url); }
+};
+$('#btnCsv').onclick = async () => {
+  if (!estado.resultados) { toast('No hay resultados'); return; }
+  let csv;
+  if (estado.real) { try { const r = await fetch(`${API}/exportar/${estado.busquedaId}.csv`, { headers: { 'X-Clave': estado.clave } }); csv = await r.text(); } catch (e) { toast(e.message); return; } }
+  else csv = '﻿producto;fuente;precio;total;puntuacion;url\n' + estado.resultados.productos.flatMap((g) => g.ofertas.map((o) => [g.nombre, o.fuente_nombre, o.precio, o.precio_total, g.puntuacion, o.url].map((v) => '"' + String(v).replace(/"/g, '""') + '"').join(';'))).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'busqueda.csv'; a.click();
+};
+async function cargarHistorial() {
+  if (!estado.real) { $('#tarjetaHistorial').hidden = true; return; }
+  try {
+    const r = await api('/busquedas?limite=10'); $('#tarjetaHistorial').hidden = !r.busquedas.length;
+    $('#historial').innerHTML = r.busquedas.map((b) => `<div class="herr"><div class="cuerpo"><b>${esc(b.texto || b.especificaciones.map((s) => s.clave + s.operador + s.valor).join(' '))}</b><small>${esc(b.creada.slice(0, 16).replace('T', ' '))} · ${esc(b.estado)} · ${b.n_ofertas} ofertas</small></div><button class="pequeno" data-id="${esc(b.id)}">Abrir</button></div>`).join('');
+    $$('#historial button').forEach((btn) => (btn.onclick = () => abrirBusqueda(btn.dataset.id)));
+  } catch { $('#tarjetaHistorial').hidden = true; }
+}
+function abrirBusqueda(id) { estado.busquedaId = id; location.hash = 'b=' + id; cambiarPestana('resultados'); sondear(); }
+async function cargarEstado() {
+  if (!estado.real) return;
+  try {
+    const c = await api('/costes');
+    $('#costes').innerHTML = `<div style="overflow-x:auto"><table class="comparar"><thead><tr><th>Proveedor</th><th>Clave</th><th>Llamadas</th><th>Coste estimado</th><th>Presupuesto</th></tr></thead><tbody>${c.mes.map((m) => `<tr><td>${esc(m.proveedor)}</td><td>${c.claves[m.proveedor] === undefined ? '—' : c.claves[m.proveedor] ? '✓' : '<span class="chip duda">falta</span>'}</td><td>${m.llamadas}</td><td>${eur(m.coste)}</td><td>${m.presupuesto ? eur(m.presupuesto) : 'sin límite'}</td></tr>`).join('')}</tbody></table></div>`;
+    const e = await api('/estado');
+    $('#estadoFuentes').innerHTML = e.fuentes.length ? `<div style="overflow-x:auto"><table class="comparar"><thead><tr><th>Fuente</th><th>Consultas</th><th>OK</th><th>Media ofertas</th><th>Última</th></tr></thead><tbody>${e.fuentes.map((f) => `<tr><td>${esc(f.slug)}</td><td>${f.consultas}</td><td>${f.ok}</td><td>${(+f.media_ofertas).toFixed(1)}</td><td>${esc(String(f.ultima).slice(0, 16).replace('T', ' '))}</td></tr>`).join('')}</tbody></table></div>` : 'Sin consultas todavía.';
+    await cargarEventos();
+  } catch (ex) { $('#costes').textContent = ex.message; }
+}
+async function cargarEventos() {
+  if (!estado.real) return;
+  try { const r = await api('/eventos?limite=60'); $('#eventos').textContent = r.eventos.map((e) => `${e.fecha.slice(5, 16).replace('T', ' ')} ${e.nivel.padEnd(5)} ${(e.fuente || '-').padEnd(14)} ${e.mensaje}${e.datos ? ' ' + JSON.stringify(e.datos) : ''}`).join('\n') || 'Sin eventos.'; } catch (e) { $('#eventos').textContent = e.message; }
+}
+$('#btnEventos').onclick = cargarEventos;
+$('#btnGuardarClave').onclick = async () => { estado.clave = $('#clave').value.trim(); almacen.set('clave', estado.clave); if (await conectar()) { toast('Conectado'); await cargarHerramientas(); cargarAlertas(); cargarHistorial(); cargarEstado(); } };
+$('#btnOlvidarClave').onclick = async () => { estado.clave = ''; almacen.del('clave'); $('#clave').value = ''; ponerConexion(false, 'clave olvidada: modo demo'); await cargarHerramientas(); cargarAlertas(); };
+
+// ------------------------------------------------------------------ pestañas, teclado, arranque
+function cambiarPestana(nombre) {
+  $$('nav.pestanas [role=tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === nombre)));
+  $$('section.panel').forEach((s) => s.classList.toggle('activa', s.id === 'panel-' + nombre));
+  if (nombre === 'alertas') cargarAlertas(); if (nombre === 'estado') cargarEstado(); if (nombre === 'busqueda') cargarHistorial();
+  window.scrollTo({ top: 0 });
+}
+$$('nav.pestanas [role=tab]').forEach((b, i, arr) => { b.onclick = () => cambiarPestana(b.dataset.tab); b.onkeydown = (e) => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { const j = (i + (e.key === 'ArrowRight' ? 1 : -1) + arr.length) % arr.length; arr[j].focus(); arr[j].click(); } }; });
+async function arrancar() {
+  $('#clave').value = estado.clave;
+  casoMiniPC();
+  await conectar();
+  await cargarHerramientas();
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.get('b') && estado.real) abrirBusqueda(h.get('b'));
+  else if (h.get('q')) { $('#texto').value = h.get('q'); $('#btnInterpretar').click(); }
+  cargarHistorial();
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => { });
+}
+arrancar();
+</script>
 </body>
 </html>

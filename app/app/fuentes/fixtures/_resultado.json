@@ -1,0 +1,101 @@
+{
+ "geizhals": {
+  "url": "https://geizhals.eu/?fs=mini+pc+16gb",
+  "estado": 403,
+  "tipo": "text/html; charset=UTF-8",
+  "bytes": 34114,
+  "anti_bot": true,
+  "final": "https://geizhals.eu/?fs=mini+pc+16gb",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "idealo": {
+  "url": "https://www.idealo.es/resultados.html?q=mini+pc+16gb",
+  "estado": 403,
+  "tipo": "text/html",
+  "bytes": 3887,
+  "anti_bot": false,
+  "final": "https://www.idealo.es/resultados.html?q=mini+pc+16gb",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "pccomponentes": {
+  "url": "https://www.pccomponentes.com/buscar/?query=mini+pc+16gb",
+  "estado": 403,
+  "tipo": "text/html; charset=UTF-8",
+  "bytes": 5718,
+  "anti_bot": true,
+  "final": "https://www.pccomponentes.com/buscar/?query=mini+pc+16gb",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "chollometro": {
+  "url": "https://www.chollometro.com/search?q=mini+pc+16gb",
+  "estado": 200,
+  "tipo": "text/html; charset=utf-8",
+  "bytes": 255646,
+  "anti_bot": false,
+  "final": "https://www.chollometro.com/search?q=mini+pc+16gb",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "chollometro-rss": {
+  "url": "https://www.chollometro.com/rss/busqueda?q=mini+pc+16gb",
+  "estado": 404,
+  "tipo": "text/html; charset=UTF-8",
+  "bytes": 27320,
+  "anti_bot": false,
+  "final": "https://www.chollometro.com/rss/busqueda?q=mini+pc+16gb",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "kelkoo": {
+  "url": "https://www.kelkoo.es/ss-mini+pc+16gb.html",
+  "estado": 403,
+  "tipo": "text/html;charset=utf-8",
+  "bytes": 772,
+  "anti_bot": true,
+  "final": "https://www.kelkoo.es/ss-mini+pc+16gb.html",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "coolmod": {
+  "url": "https://www.coolmod.com/busqueda/?q=mini+pc+16gb",
+  "estado": 403,
+  "tipo": "text/html",
+  "bytes": 14282,
+  "anti_bot": true,
+  "final": "https://www.coolmod.com/busqueda/?q=mini+pc+16gb",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "mediamarkt": {
+  "url": "https://www.mediamarkt.es/es/search.html?query=mini+pc+16gb",
+  "estado": 403,
+  "tipo": "text/html; charset=UTF-8",
+  "bytes": 13410,
+  "anti_bot": true,
+  "final": "https://www.mediamarkt.es/es/search.html?query=mini+pc+16gb",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "backmarket": {
+  "url": "https://www.backmarket.es/es-es/search?q=mini+pc+16gb",
+  "estado": 403,
+  "tipo": "text/plain;charset=UTF-8",
+  "bytes": 34,
+  "anti_bot": false,
+  "final": "https://www.backmarket.es/es-es/search?q=mini+pc+16gb",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "geeknetic": {
+  "url": "https://www.geeknetic.es/comparador-precios/buscar/mini+pc+16gb",
+  "estado": 200,
+  "tipo": "text/html; Charset=UTF-8",
+  "bytes": 83594,
+  "anti_bot": false,
+  "final": "https://www.geeknetic.es/",
+  "fecha": "2026-09-13 18:05 UTC"
+ },
+ "notebookcheck": {
+  "url": "https://www.notebookcheck.org/Suche.99.0.html?q=mini+pc+16gb",
+  "estado": 404,
+  "tipo": "text/html; charset=UTF-8",
+  "bytes": 1860,
+  "anti_bot": false,
+  "final": "https://www.notebookcheck.org/Suche.99.0.html?q=mini+pc+16gb",
+  "fecha": "2026-09-13 18:05 UTC"
+ }
+}

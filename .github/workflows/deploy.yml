@@ -78,6 +78,52 @@ jobs:
           FLY_APP: ${{ steps.app.outputs.app }}
         run: flyctl apps create "${FLY_APP}" --org desdemovil || true
 
+      # SQLite vive en un volumen: se crea una sola vez, en la region de fly.toml.
+      - name: Crear el volumen de datos si no existe
+        if: steps.fly.outputs.configurado == 'true'
+        env:
+          FLY_APP: ${{ steps.app.outputs.app }}
+        run: |
+          region="$(sed -n 's/^primary_region *= *"\(.*\)"/\1/p' app/fly.toml)"
+          existe="$(flyctl volumes list --app "${FLY_APP}" --json \
+            | python3 -c 'import json,sys; v=json.load(sys.stdin); print(any((x.get("name") or x.get("Name")) == "datos" for x in v))')"
+          if [ "${existe}" = "True" ]; then
+            echo "Volumen datos ya existe."
+          else
+            flyctl volumes create datos --app "${FLY_APP}" --region "${region}" --size 1 --yes
+          fi
+
+      # Secretos opcionales del proyecto: solo se pasan los que existen en el repo, sin imprimirlos.
+      - name: Pasar los secretos del proyecto a Fly
+        if: steps.fly.outputs.configurado == 'true'
+        env:
+          FLY_APP: ${{ steps.app.outputs.app }}
+          BP_CLAVE: ${{ secrets.BP_CLAVE }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          BP_IA_TOKEN: ${{ secrets.BP_IA_TOKEN }}
+          BP_IA_BASE_URL: ${{ vars.BP_IA_BASE_URL }}
+          SERPER_API_KEY: ${{ secrets.SERPER_API_KEY }}
+          EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
+          EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          KEEPA_API_KEY: ${{ secrets.KEEPA_API_KEY }}
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          presentes=""
+          for nombre in BP_CLAVE ANTHROPIC_API_KEY BP_IA_TOKEN BP_IA_BASE_URL SERPER_API_KEY EBAY_CLIENT_ID EBAY_CLIENT_SECRET FIRECRAWL_API_KEY KEEPA_API_KEY APIFY_TOKEN TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID; do
+            valor="${!nombre}"
+            if [ -n "${valor}" ]; then
+              presentes="${presentes} ${nombre}"
+              flyctl secrets set "${nombre}=${valor}" --app "${FLY_APP}" --stage > /dev/null
+            fi
+          done
+          echo "Secretos pasados a Fly (solo nombres):${presentes:- ninguno}"
+          if [ -z "${BP_CLAVE}" ]; then
+            echo "::warning::Falta el secreto BP_CLAVE: /api/v1 respondera 503 hasta que se cree (ver docs/planificacion/HOJA_DE_RUTA.md)."
+          fi
+
       - name: Fijar BUILD_ID con el SHA del commit
         if: steps.fly.outputs.configurado == 'true'
         env:
@@ -127,6 +173,46 @@ jobs:
             || { echo "::error::/holamundo sin cabecera CORS"; exit 1; }
           echo "OK: /holamundo responde 'holamundo' con CORS"
 
+      # Humo de la API: catalogo sembrado y una busqueda en modo enlace de principio a fin.
+      - name: Verificar /api/v1 (catalogo y busqueda de humo)
+        if: steps.fly.outputs.configurado == 'true'
+        env:
+          FLY_APP: ${{ steps.app.outputs.app }}
+          BP_CLAVE: ${{ secrets.BP_CLAVE }}
+        run: |
+          if [ -z "${BP_CLAVE}" ]; then
+            echo "Sin BP_CLAVE: se omite la prueba de humo de la API."
+            exit 0
+          fi
+          base="https://${FLY_APP}.fly.dev/api/v1"
+          n="$(curl -fsS --max-time 30 -H "X-Clave: ${BP_CLAVE}" "${base}/herramientas" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["herramientas"]))')"
+          echo "Herramientas en el catalogo: ${n}"
+          [ "${n}" -ge 30 ] || { echo "::error::El catalogo tiene ${n} herramientas (< 30)"; exit 1; }
+          id="$(curl -fsS --max-time 30 -H "X-Clave: ${BP_CLAVE}" -H 'Content-Type: application/json' \
+            -d '{"texto":"mini pc 8gb","precio_min":130,"precio_max":330,"interpretar":false,"fuentes":["idealo","amazon-es","ebay","wallapop"]}' \
+            "${base}/busquedas" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
+          echo "Busqueda de humo: ${id}"
+          for intento in $(seq 1 20); do
+            estado="$(curl -fsS --max-time 30 -H "X-Clave: ${BP_CLAVE}" "${base}/busquedas/${id}" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["estado"], d["progreso"]["terminadas"], "/", d["progreso"]["total"])')"
+            echo "Intento ${intento}: ${estado}"
+            case "${estado}" in terminada*) exit 0;; error*) echo "::error::La busqueda de humo termino en error"; exit 1;; esac
+            sleep 3
+          done
+          echo "::error::La busqueda de humo no termino en 60 s"; exit 1
+
+      # El sandbox de las sesiones no alcanza Fly: si algo falla, los logs de la app tienen que salir aqui.
+      - name: Diagnostico (logs de la app) si el despliegue falla
+        if: failure() && steps.fly.outputs.configurado == 'true'
+        env:
+          FLY_APP: ${{ steps.app.outputs.app }}
+        run: |
+          echo "### Diagnostico del fallo" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          flyctl status --app "${FLY_APP}" 2>&1 | tail -30 | tee -a "$GITHUB_STEP_SUMMARY" || true
+          echo "--- ultimos logs ---" | tee -a "$GITHUB_STEP_SUMMARY"
+          timeout 60 flyctl logs --app "${FLY_APP}" --no-tail 2>&1 | tail -80 | tee -a "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
       - name: Resumen del despliegue
         if: success() && steps.fly.outputs.configurado == 'true'
         env:
@@ -141,5 +227,6 @@ jobs:
             echo "- Salud: https://${FLY_APP}.fly.dev/salud"
             echo "- Hola mundo: https://${FLY_APP}.fly.dev/holamundo"
             echo "- Comprobacion desde Pages: https://${GITHUB_REPOSITORY%%/*}.github.io/${GITHUB_REPOSITORY#*/}/holamundo.html"
+            echo "- API: https://${FLY_APP}.fly.dev/api/v1/salud-bd (cabecera X-Clave)"
             echo "- Build (SHA): \`${GITHUB_SHA}\`"
           } >> "$GITHUB_STEP_SUMMARY"

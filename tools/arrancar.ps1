@@ -1,12 +1,12 @@
-# Arranca la app entera en el PC: backend de Rust + docs/ servido por HTTP.
+# Arranca la app entera en el PC: backend Python (FastAPI) + docs/ servido por HTTP.
 # No toca la nube ni necesita Docker. Ctrl+C para el backend y el servidor web.
 # Uso: pwsh -File tools\arrancar.ps1
 #      pwsh -File tools\arrancar.ps1 -PuertoApi 9080 -PuertoWeb 9081
-#      pwsh -File tools\arrancar.ps1 -Release -SinNavegador
+#      pwsh -File tools\arrancar.ps1 -Clave mi-clave -SinNavegador
 param(
   [int]$PuertoApi = 8080,
   [int]$PuertoWeb = 8081,
-  [switch]$Release,
+  [string]$Clave = 'local',
   [switch]$SinNavegador
 )
 $ErrorActionPreference = 'Stop'
@@ -22,25 +22,16 @@ foreach ($carpeta in @($App, $Docs)) {
   }
 }
 
-if (-not (Get-Command cargo -ErrorAction SilentlyContinue)) {
-  Write-Host "arrancar : ERROR - falta cargo. Instala Rust desde https://rustup.rs y reabre la consola." -ForegroundColor Red
+if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+  Write-Host "arrancar : ERROR - falta uv. Instalalo desde https://docs.astral.sh/uv/ y reabre la consola." -ForegroundColor Red
   exit 1
 }
 
-# --- compilar ---------------------------------------------------------------
-$perfil = if ($Release) { 'release' } else { 'debug' }
-Write-Host "arrancar : compilando el backend ($perfil)..."
-$argumentos = @('build', '--manifest-path', (Join-Path $App 'Cargo.toml'))
-if ($Release) { $argumentos += '--release' }
-& cargo @argumentos
+# --- dependencias -----------------------------------------------------------
+Write-Host "arrancar : instalando dependencias (uv sync)..."
+& uv sync --frozen --directory $App
 if ($LASTEXITCODE -ne 0) {
-  Write-Host "arrancar : ERROR - cargo build fallo con codigo $LASTEXITCODE." -ForegroundColor Red
-  exit 1
-}
-
-$binario = Join-Path $App "target\$perfil\buscaproducto-backend.exe"
-if (-not (Test-Path $binario)) {
-  Write-Host "arrancar : ERROR - no encuentro el binario en $binario." -ForegroundColor Red
+  Write-Host "arrancar : ERROR - uv sync fallo con codigo $LASTEXITCODE." -ForegroundColor Red
   exit 1
 }
 
@@ -50,7 +41,9 @@ if ($LASTEXITCODE -ne 0 -or -not $sha) { $sha = 'sin-git' }
 
 $env:BUILD_ID = "local-$sha"
 $env:PUERTO   = $PuertoApi
-$backend = Start-Process -FilePath $binario -PassThru -NoNewWindow
+$env:BP_CLAVE = $Clave
+$env:BP_BD    = Join-Path $App 'datos\buscaproducto.sqlite'
+$backend = Start-Process -FilePath 'uv' -ArgumentList @('run', '--directory', $App, 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', "$PuertoApi") -PassThru -NoNewWindow
 
 # El puerto tarda un instante en abrirse: se espera antes de anunciar nada.
 $listo = $false
@@ -72,7 +65,7 @@ if (-not $listo) {
   exit 1
 }
 
-Write-Host "arrancar : backend en http://localhost:$PuertoApi/ (build local-$sha)"
+Write-Host "arrancar : backend en http://localhost:$PuertoApi/ (build local-$sha, clave: $Clave)"
 
 # --- servidor estatico de docs/ ---------------------------------------------
 $tipos = @{

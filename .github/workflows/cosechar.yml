@@ -1,0 +1,68 @@
+name: Cosechar con navegador
+
+# Cron nocturno: Playwright en el runner visita las paginas que necesitan JavaScript y las ofertas vigiladas,
+# y se las entrega al backend para que el Extractor (IA) saque ofertas y precios. Si un adaptador con parser
+# deja de devolver resultados, el Reparador propone un arreglo y este workflow abre una PR en borrador.
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: cosechar
+  cancel-in-progress: false
+
+jobs:
+  cosechar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BP_CLAVE: ${{ secrets.BP_CLAVE }}
+      FLY_APP_VAR: ${{ vars.FLY_APP }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.17"
+      - name: Determinar la app de Fly
+        id: app
+        run: |
+          if [ -n "${FLY_APP_VAR}" ]; then app="${FLY_APP_VAR}"; else
+            nombre="${GITHUB_REPOSITORY#*/}"; owner="${GITHUB_REPOSITORY%%/*}"
+            app="$(printf '%s-%s' "${nombre}" "${owner}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-' '-' | cut -c1-30 | sed 's/-*$//')"
+          fi
+          echo "app=${app}" >> "$GITHUB_OUTPUT"
+      - name: Instalar dependencias y Chromium
+        working-directory: app
+        run: |
+          uv sync --frozen --group cosecha
+          uv run playwright install --with-deps chromium
+      - name: Cosechar
+        id: cosecha
+        working-directory: app
+        env:
+          BP_URL: https://${{ steps.app.outputs.app }}.fly.dev
+        run: |
+          [ -n "${BP_CLAVE}" ] || { echo "::error::Falta el secreto BP_CLAVE"; exit 1; }
+          uv run python -m app.tareas.cosecha
+      - name: Abrir PR con la propuesta del Reparador
+        if: steps.cosecha.outputs.reparaciones != '0' && steps.cosecha.outputs.reparaciones != ''
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: reparador/propuesta
+          commit-message: "Proponer reparación de adaptadores (Reparador)"
+          title: "Reparador: propuesta para adaptadores con 0 resultados anómalo"
+          body: |
+            El cosechador detectó un adaptador con parser que devuelve 0 resultados con HTML no vacío.
+            Se adjuntan la fixture nueva (`app/app/fuentes/fixtures/<slug>/`) y el código propuesto
+            (`app/app/fuentes/<slug>.py.propuesto`). Revísalo, renómbralo sobre el adaptador y comprueba los tests.
+            Nada se fusiona solo.
+          draft: true
+          add-paths: |
+            app/app/fuentes/fixtures/**
+            app/app/fuentes/*.propuesto

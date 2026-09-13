@@ -9,12 +9,12 @@ Flujo "PC arranca, móvil continúa": el desarrollo, la revisión y las pruebas 
 | Proyecto | `buscaproducto` |
 | Owner de GitHub | `npiobject-labs` |
 | App de Fly.io | `buscaproducto-npiobject-labs` |
-| Carpeta de Drive (id) | `17fTMr0BSKGLFcAYC-U_L54WuBBG09rUU` |
+| Carpeta de Drive (id) | `121ANQkl_1f8XAPVhkL9WOHOMM5A-Y1ZW` |
 
 Esta tabla la rellena sola `.github/workflows/init-plantilla.yml` en el primer push de un repo creado desde la plantilla; no hay nada que tocar a mano salvo el id de Drive.
 
 - **App de Fly.io**: `derivada` significa que `deploy.yml` la calcula como `<repo>-<owner>` en minúsculas, saneado a `[a-z0-9-]` y recortado a 30 caracteres. Si existe la variable de repositorio `FLY_APP`, esa manda; anota aquí el valor cuando la definas.
-- **Carpeta de Drive (id)**: vacío significa que este proyecto no usa Drive. Ver ARRANQUE.md para activarlo a mitad de proyecto.
+- **Carpeta de Drive (id)**: vacío significa que este proyecto no usa Drive. Ver ARRANQUE.md para activarlo a mitad de proyecto. La carpeta es `Mi unidad/buscaproducto` de la cuenta **fsantagonza@gmail.com**, que es la que tiene conectado el conector de Drive. El id anterior (`17fTMr0B…`) era de otra cuenta y desde las sesiones daba «Requested entity was not found».
 
 ## Fuente de verdad
 
@@ -37,24 +37,27 @@ La carpeta local del PC es un espejo de solo lectura. Nunca la trates como orige
 | Bitácora (Pages) | https://npiobject-labs.github.io/buscaproducto/bitacora.html | idem; el índice lo genera `pages.yml` |
 | Backend (Fly.io, opcional) | `https://<app de Fly>.fly.dev/` · `/salud` · `/holamundo` | `.github/workflows/deploy.yml` en push a `main` que toque `app/**` |
 | Comprobación del backend (Pages) | https://npiobject-labs.github.io/buscaproducto/holamundo.html | página estática que llama a `/holamundo` y `/salud` desde el navegador |
+| API del buscador (Fly) | `https://<app de Fly>.fly.dev/api/v1/…` (cabecera `X-Clave`) | `deploy.yml`; humo de `/api/v1` solo si existe el secreto `BP_CLAVE` |
+| Vigilancia diaria / cosecha nocturna | runs de `vigilar.yml` (07:00 UTC) y `cosechar.yml` (03:00 UTC) | necesitan `BP_CLAVE`; ver `docs/planificacion/HOJA_DE_RUTA.md` |
 
 Pages está siempre activo. Fly también: `FLY_API_TOKEN` es un secreto de la organización `npiobject-labs` y lo heredan sus repos **públicos**, así que `deploy.yml` despliega sin configurar nada. Si el repo fuera privado (plan Free) o viviera fuera de la organización, el secreto no llega y `deploy.yml` termina en verde con el aviso "Fly no configurado" sin desplegar nada.
 
 ## Código
 
 - Todo cambio termina en commit + push a `main`. Mensajes de commit en español, imperativo.
-- Backend en `app/` (Rust, axum + tokio). `GET /` devuelve texto plano; `GET /salud` devuelve `{"ok":true,"build":"<BUILD_ID>"}`, donde `BUILD_ID` es el SHA que inyecta el workflow.
+- Backend en `app/` (**Python 3.12, FastAPI + uvicorn**, dependencias con `uv`; decisión D-01 en `docs/planificacion/DECISIONES.md`). `GET /` devuelve texto plano; `GET /salud` devuelve `{"ok":true,"build":"<BUILD_ID>"}`, donde `BUILD_ID` es el SHA que inyecta el workflow. La API real cuelga de `/api/v1` y exige la cabecera `X-Clave` (secreto `BP_CLAVE`). SQLite en `/datos` (volumen de Fly). Tests: `cd app && uv run pytest`; lint: `uv run ruff check app tests`. El seed del catálogo (`app/app/seed/herramientas.json`) se regenera con `uv run python -m app.seed.generar` cuando cambia `docs/planificacion/CATALOGO_HERRAMIENTAS.md`; `ci.yml` falla si divergen.
 - `GET /holamundo` devuelve `holamundo` en texto plano; `/holamundo` y `/salud` llevan `Access-Control-Allow-Origin: *` porque los consume `docs/holamundo.html` desde Pages (otro origen). Si añades más rutas para el frontend, ponles la misma cabecera. `deploy.yml` verifica las dos rutas y falla si cambian.
 - `docs/holamundo.html` toma el nombre de la app de Fly del `<meta name="fly-app">` (`<repo>-<owner>`, como lo deriva `deploy.yml`). Si el proyecto define `FLY_APP` con otro nombre, actualiza ese `content` en el mismo commit.
 - `app/fly.toml` no lleva clave `app`: el nombre se pasa con `--app` desde `deploy.yml`.
 - El backend escucha en 8080, que es lo que espera Fly; la variable de entorno `PUERTO` solo la usa `tools/arrancar.ps1` para probar en el PC.
-- Mocks estáticos en `docs/`. `docs/index.html` es el mock vivo; los anteriores se archivan en `docs/mocks/NNN-nombre.html`.
+- `docs/index.html` es la **app real** (PWA, un solo fichero, sin CDNs) con modo demo integrado (sin clave muestra datos de ejemplo); las versiones anteriores se archivan en `docs/mocks/NNN-nombre.html`. Al tocarla, repetir la verificación con Playwright (D-16 en DECISIONES.md).
 - El índice `docs/mocks/index.html` lo genera `pages.yml` en cada publicación, leyendo el `<title>` y el `<meta name="build">` de cada mock archivado. No lo edites ni lo commitees: está en `.gitignore`.
 - Cada mock lleva `<meta name="build" content="BU-B1-AAAAMMDD-NNN">` con un número nuevo en cada iteración.
 - Nunca pongas claves, endpoints internos ni datos reales en `docs/`: el sitio es público.
 
 ## Documentación
 
+- La planificación del proyecto está en `docs/planificacion/`: empieza por `PLAN.md` y sigue la sesión que toque en `HOJA_DE_RUTA.md` (cada una lleva su prompt de arranque). Las decisiones (p. ej. backend en Python a partir de F2, D-01) están en `DECISIONES.md`.
 - Cada documento de planificación, decisión o resumen de sesión se escribe en `docs/planificacion/` de este repo, y solo ahí se edita.
 - Si existe `docs/plantilla/`, es el historial de la plantilla de origen que apartó `init-plantilla.yml`: referencia de solo lectura, nunca se edita ni se mezcla con `docs/planificacion/`.
 - Si hay id de Drive en **Parámetros**, al cerrar sesión se sube copia como fichero, sin conversión a formato Google (`disableConversionToGoogleType=true`), tanto `.md` como `.html/.png/.svg`.
@@ -83,7 +86,7 @@ Si necesitas comprobar algo desde la sesión, hazlo contra la API de GitHub (`ht
 ## Aterrizaje en el PC
 
 - Solo a petición y solo con Claude Desktop conectado: `tools/aterrizar.ps1` (idempotente, sobrescribe la copia local sin preguntar). "¿Estoy al día?" = `tools/estado.ps1`. Ambos aceptan `-Proyecto`, `-Owner`, `-Remote`, `-Root` y `-Rama`.
-- `tools/arrancar.ps1` levanta la app entera en el PC sin tocar la nube: compila el backend, lo sirve en `localhost:8080` y publica `docs/` en `localhost:8081`. Acepta `-PuertoApi`, `-PuertoWeb`, `-Release` y `-SinNavegador`. Necesita Rust; no necesita Docker.
+- `tools/arrancar.ps1` levanta la app entera en el PC sin tocar la nube: instala las dependencias con `uv`, sirve el backend en `localhost:8080` y publica `docs/` en `localhost:8081`. Acepta `-PuertoApi`, `-PuertoWeb`, `-Clave` y `-SinNavegador`. Necesita `uv` (https://docs.astral.sh/uv/); no necesita Docker ni Rust.
 - `tools/eliminar.ps1` borra el proyecto entero: app de Fly, repositorio y copia local. Sin `-Confirmar` solo enseña el plan; con él pide escribir el nombre. Drive y las sesiones quedan a mano. Solo se ejecuta si el usuario lo pide explícitamente.
 - Servidas desde `localhost`, las páginas de `docs/` llaman al backend local en vez de al de Fly, tomando el puerto de `?api=` (8080 por defecto). En Pages no cambia nada.
 

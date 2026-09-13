@@ -1,0 +1,39 @@
+name: CI del backend
+
+on:
+  push:
+    paths:
+      - 'app/**'
+      - 'docs/planificacion/CATALOGO_HERRAMIENTAS.md'
+      - '.github/workflows/ci.yml'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: ruff + pytest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.8.17"
+      - name: Instalar dependencias
+        run: uv sync --frozen --group dev
+      - name: Lint y formato
+        run: |
+          uv run ruff check app tests
+          uv run ruff format --check app tests
+      - name: Seed al día con el catálogo
+        run: uv run python -m app.seed.generar --comprobar
+      - name: Tests (sin IA)
+        env:
+          BP_CLAVE: clave-de-ci
+        run: uv run pytest -q -m "not ia"

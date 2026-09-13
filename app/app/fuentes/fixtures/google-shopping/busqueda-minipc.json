@@ -1,0 +1,9 @@
+{
+ "searchParameters": {"q": "mini pc 16gb", "gl": "es", "hl": "es", "type": "shopping"},
+ "shopping": [
+  {"title": "Beelink Mini S12 Pro Mini PC, Intel N100, 16 GB RAM, 500 GB SSD", "source": "PcComponentes", "link": "https://www.pccomponentes.com/beelink-mini-s12-pro-intel-n100-16gb-500gb-ssd", "price": "199,99 €", "delivery": "Envío gratis", "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=1", "rating": 4.6, "ratingCount": 812, "position": 1},
+  {"title": "Mini PC GMKtec NucBox G3 Plus Intel N150 16GB DDR4 1TB SSD", "source": "Amazon.es", "link": "https://www.amazon.es/dp/B0EXAMPLE1", "price": "219,00 €", "delivery": "Envío gratis", "imageUrl": "https://encrypted-tbn0.gstatic.com/shopping?q=2", "rating": 4.4, "ratingCount": 1543, "position": 2},
+  {"title": "Minisforum UN100L Mini PC N100 16GB 512GB", "source": "MediaMarkt", "link": "https://www.mediamarkt.es/es/product/_minisforum-un100l-123.html", "price": "249 €", "delivery": "+4,99 € de envío", "position": 3},
+  {"title": "Mini PC 4GB 64GB Celeron", "source": "AliExpress", "link": "https://es.aliexpress.com/item/1005.html", "price": "89,50 €", "delivery": "Envío gratis", "position": 4}
+ ]
+}
