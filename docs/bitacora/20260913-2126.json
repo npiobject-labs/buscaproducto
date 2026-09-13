@@ -27,16 +27,18 @@
     "docs/mocks/000-mock0.html: archivado el mock anterior. docs/manifest.webmanifest, docs/sw.js, docs/icono.svg nuevos.",
     ".github/workflows/: ci.yml, fuentes.yml, vigilar.yml y cosechar.yml nuevos; deploy.yml con volumen, secretos, humo de la API y diagnóstico.",
     "docs/planificacion/: HOJA_DE_RUTA.md con el estado real, DECISIONES.md D-13 a D-16, robots.md y enlaces.md generados desde el runner.",
-    "CLAUDE.md, README.md y ARRANQUE.md actualizados al backend Python."
+    "CLAUDE.md, README.md y ARRANQUE.md actualizados al backend Python.",
+    "app/Dockerfile: entorno de Python construido en /app/.venv y arranque con el intérprete absoluto; el venv copiado desde otra ruta dejaba «uvicorn: not found» y la máquina reiniciaba en bucle. Comprobación de la imagen en la propia construcción y volcado de los logs de Fly si el despliegue falla."
   ],
   "sha": "ff20353",
   "sha_completo": "ff2035343164c2f600b234ebfa500031ea163820",
-  "run": "34777619809",
+  "run": "34778011356",
   "mock": "mocks/000-mock0.html",
   "build": "BU-B1-20260913-003",
   "pagina": "index.html",
   "fly": "https://buscaproducto-npiobject-labs.fly.dev/salud",
   "pendiente": [
+    "Backend desplegado y verificado (/salud con el SHA y /holamundo); la prueba de humo de /api/v1 se omitió porque BP_CLAVE está vacío",
     "Fusionar la PR #1 en main para publicar la web y desplegar desde main",
     "Crear el secreto BP_CLAVE: sin él /api/v1 responde 503 y no corren vigilar.yml ni cosechar.yml",
     "Crear BP_IA_TOKEN (gateway de IA), SERPER_API_KEY, EBAY_CLIENT_ID/SECRET, FIRECRAWL_API_KEY y TELEGRAM_BOT_TOKEN/CHAT_ID",
@@ -57,5 +59,5 @@
       "url": "planificacion/DECISIONES.md"
     }
   ],
-  "notas": "Los prompts son la transcripción de lo pedido en la sesión. La verificación de la interfaz se hizo con Playwright dentro de la sesión (27 comprobaciones); la de las fuentes externas, con el workflow fuentes.yml desde el runner, porque el sandbox no alcanza internet."
+  "notas": "Los prompts son la transcripción de lo pedido en la sesión. La verificación de la interfaz se hizo con Playwright dentro de la sesión (27 comprobaciones); la de las fuentes externas, con el workflow fuentes.yml desde el runner, porque el sandbox no alcanza internet. El despliegue en Fly costó tres intentos: el primero falló por permisos del volumen y el segundo por el shebang del entorno de Python; el tercero (run 34778011356, SHA a26d581) terminó en success."
 }
