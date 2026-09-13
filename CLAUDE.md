@@ -43,7 +43,7 @@ Pages está siempre activo. Fly también: `FLY_API_TOKEN` es un secreto de la or
 ## Código
 
 - Todo cambio termina en commit + push a `main`. Mensajes de commit en español, imperativo.
-- Backend en `app/` (Rust, axum + tokio). `GET /` devuelve texto plano; `GET /salud` devuelve `{"ok":true,"build":"<BUILD_ID>"}`, donde `BUILD_ID` es el SHA que inyecta el workflow.
+- Backend en `app/` (**Python 3.12, FastAPI + uvicorn**, dependencias con `uv`; decisión D-01 en `docs/planificacion/DECISIONES.md`). `GET /` devuelve texto plano; `GET /salud` devuelve `{"ok":true,"build":"<BUILD_ID>"}`, donde `BUILD_ID` es el SHA que inyecta el workflow. La API real cuelga de `/api/v1` y exige la cabecera `X-Clave` (secreto `BP_CLAVE`). SQLite en `/datos` (volumen de Fly). Tests: `cd app && uv run pytest`; lint: `uv run ruff check app tests`. El seed del catálogo (`app/app/seed/herramientas.json`) se regenera con `uv run python -m app.seed.generar` cuando cambia `docs/planificacion/CATALOGO_HERRAMIENTAS.md`; `ci.yml` falla si divergen.
 - `GET /holamundo` devuelve `holamundo` en texto plano; `/holamundo` y `/salud` llevan `Access-Control-Allow-Origin: *` porque los consume `docs/holamundo.html` desde Pages (otro origen). Si añades más rutas para el frontend, ponles la misma cabecera. `deploy.yml` verifica las dos rutas y falla si cambian.
 - `docs/holamundo.html` toma el nombre de la app de Fly del `<meta name="fly-app">` (`<repo>-<owner>`, como lo deriva `deploy.yml`). Si el proyecto define `FLY_APP` con otro nombre, actualiza ese `content` en el mismo commit.
 - `app/fly.toml` no lleva clave `app`: el nombre se pasa con `--app` desde `deploy.yml`.
@@ -84,7 +84,7 @@ Si necesitas comprobar algo desde la sesión, hazlo contra la API de GitHub (`ht
 ## Aterrizaje en el PC
 
 - Solo a petición y solo con Claude Desktop conectado: `tools/aterrizar.ps1` (idempotente, sobrescribe la copia local sin preguntar). "¿Estoy al día?" = `tools/estado.ps1`. Ambos aceptan `-Proyecto`, `-Owner`, `-Remote`, `-Root` y `-Rama`.
-- `tools/arrancar.ps1` levanta la app entera en el PC sin tocar la nube: compila el backend, lo sirve en `localhost:8080` y publica `docs/` en `localhost:8081`. Acepta `-PuertoApi`, `-PuertoWeb`, `-Release` y `-SinNavegador`. Necesita Rust; no necesita Docker.
+- `tools/arrancar.ps1` levanta la app entera en el PC sin tocar la nube: instala las dependencias con `uv`, sirve el backend en `localhost:8080` y publica `docs/` en `localhost:8081`. Acepta `-PuertoApi`, `-PuertoWeb`, `-Clave` y `-SinNavegador`. Necesita `uv` (https://docs.astral.sh/uv/); no necesita Docker ni Rust.
 - `tools/eliminar.ps1` borra el proyecto entero: app de Fly, repositorio y copia local. Sin `-Confirmar` solo enseña el plan; con él pide escribir el nombre. Drive y las sesiones quedan a mano. Solo se ejecuta si el usuario lo pide explícitamente.
 - Servidas desde `localhost`, las páginas de `docs/` llaman al backend local en vez de al de Fly, tomando el puerto de `?api=` (8080 por defecto). En Pages no cambia nada.
 

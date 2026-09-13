@@ -6,16 +6,30 @@ primary_region = "cdg"
 [build]
   dockerfile = "Dockerfile"
 
+[env]
+  BP_BD = "/datos/buscaproducto.sqlite"
+
+# Volumen para SQLite: deploy.yml lo crea si no existe (flyctl volumes create datos).
+[mounts]
+  source = "datos"
+  destination = "/datos"
+  initial_size = "1gb"
+
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = "stop"
   auto_start_machines = true
   min_machines_running = 0
   processes = ["app"]
 
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 50
+    hard_limit = 100
+
 [[vm]]
   size = "shared-cpu-1x"
-  memory = "256mb"
+  memory = "512mb"
   cpu_kind = "shared"
   cpus = 1
