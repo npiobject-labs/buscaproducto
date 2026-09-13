@@ -1,4 +1,4 @@
-# DesdeMovil
+# buscaproducto
 
 Plantilla del método "PC arranca, móvil continúa":
 
