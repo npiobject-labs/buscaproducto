@@ -85,7 +85,9 @@ jobs:
           FLY_APP: ${{ steps.app.outputs.app }}
         run: |
           region="$(sed -n 's/^primary_region *= *"\(.*\)"/\1/p' app/fly.toml)"
-          if flyctl volumes list --app "${FLY_APP}" --json | grep -q '"name": *"datos"'; then
+          existe="$(flyctl volumes list --app "${FLY_APP}" --json \
+            | python3 -c 'import json,sys; v=json.load(sys.stdin); print(any((x.get("name") or x.get("Name")) == "datos" for x in v))')"
+          if [ "${existe}" = "True" ]; then
             echo "Volumen datos ya existe."
           else
             flyctl volumes create datos --app "${FLY_APP}" --region "${region}" --size 1 --yes
@@ -197,6 +199,19 @@ jobs:
             sleep 3
           done
           echo "::error::La busqueda de humo no termino en 60 s"; exit 1
+
+      # El sandbox de las sesiones no alcanza Fly: si algo falla, los logs de la app tienen que salir aqui.
+      - name: Diagnostico (logs de la app) si el despliegue falla
+        if: failure() && steps.fly.outputs.configurado == 'true'
+        env:
+          FLY_APP: ${{ steps.app.outputs.app }}
+        run: |
+          echo "### Diagnostico del fallo" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          flyctl status --app "${FLY_APP}" 2>&1 | tail -30 | tee -a "$GITHUB_STEP_SUMMARY" || true
+          echo "--- ultimos logs ---" | tee -a "$GITHUB_STEP_SUMMARY"
+          timeout 60 flyctl logs --app "${FLY_APP}" --no-tail 2>&1 | tail -80 | tee -a "$GITHUB_STEP_SUMMARY" || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Resumen del despliegue
         if: success() && steps.fly.outputs.configurado == 'true'

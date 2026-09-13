@@ -23,9 +23,13 @@ RUN useradd --system --create-home --uid 10001 buscaproducto \
 WORKDIR /app
 COPY --from=builder --chown=buscaproducto:buscaproducto /src/.venv /app/.venv
 COPY --from=builder --chown=buscaproducto:buscaproducto /src/app /app/app
-USER buscaproducto
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
+# Se arranca como root solo para ajustar el propietario del volumen montado; entrypoint.sh
+# baja a uid 10001 antes de ejecutar el CMD.
 ENV PATH="/app/.venv/bin:$PATH" PYTHONUNBUFFERED=1 PUERTO=8080 BP_BD=/datos/buscaproducto.sqlite
 EXPOSE 8080
 
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PUERTO:-8080} --no-access-log"]
