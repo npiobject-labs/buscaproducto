@@ -8,6 +8,10 @@ name: Verificar fuentes (robots, enlaces, fixtures)
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/fuentes.yml'
+      - 'tools/verificar_fuentes.py'
   schedule:
     - cron: '0 6 1 * *'
 
