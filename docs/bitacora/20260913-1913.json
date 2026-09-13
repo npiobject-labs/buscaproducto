@@ -7,8 +7,16 @@
       "texto": "Genera la mejor planificación posible, basada en los documentos adjuntos (CATALOGO_HERRAMIENTAS.md y PLAN.md), para buscar productos. No tienes restricciones. Si es necesario, utiliza scrappers y agentes IA. Para cuando consideres que la app cumple con todas las funcionalidades del mejor buscador posible.",
       "nota": "Adjuntos: el plan y el catálogo del proyecto local en Windows (Python, Fases 1 y 2 hechas allí)."
     },
-    { "texto": "desconecto" },
-    { "texto": "internet, sigue trabajando" }
+    {
+      "texto": "desconecto"
+    },
+    {
+      "texto": "internet, sigue trabajando"
+    },
+    {
+      "texto": "Drive lo has creado en zambron@gmail.com y debe estar en fsantagonza@gmail.com. ¿Lo cambias?",
+      "nota": "El conector ya estaba en la cuenta correcta; el id de CLAUDE.md era el de la otra cuenta y no se veía desde la sesión."
+    }
   ],
   "cambios": [
     "docs/planificacion/PLAN.md: plan maestro con 9 criterios de cierre, requisitos, 9 fases, estrategia de fuentes (niveles A/B/C/D) e IA (4 agentes), costes, riesgos y verificación.",
@@ -16,7 +24,8 @@
     "docs/planificacion/CATALOGO_HERRAMIENTAS.md: 39 herramientas en 7 categorías con url_plantilla_busqueda, nivel y fase.",
     "docs/planificacion/DECISIONES.md: 12 ADR con plan B (Python en vez de Rust, Pages+Fly, SQLite, clave X-Clave, crons en Actions, Playwright en runner, modelos Claude, Serper/Keepa, adaptador universal IA, reparador por PR, 3 casos de aceptación, cierre por criterios).",
     "docs/planificacion/HOJA_DE_RUTA.md: 23 sesiones con criterio verificable y prompt de arranque; tabla de secretos.",
-    "docs/planificacion/README.md y CLAUDE.md: índice y puntero a la planificación."
+    "docs/planificacion/README.md y CLAUDE.md: índice y puntero a la planificación.",
+    "CLAUDE.md: id de la carpeta de Drive cambiado a Mi unidad/buscaproducto de fsantagonza@gmail.com; copias de docs/planificacion/ subidas allí."
   ],
   "sha": "278068b",
   "sha_completo": "278068b9c8c95dcc6cb7de7402531d193b12e2b5",
@@ -32,8 +41,18 @@
     "Verificar las URL de búsqueda marcadas (verificar) en la sesión 2.3"
   ],
   "enlaces": [
-    { "texto": "Plan maestro", "url": "planificacion/PLAN.md" },
-    { "texto": "Hoja de ruta", "url": "planificacion/HOJA_DE_RUTA.md" }
+    {
+      "texto": "Plan maestro",
+      "url": "planificacion/PLAN.md"
+    },
+    {
+      "texto": "Hoja de ruta",
+      "url": "planificacion/HOJA_DE_RUTA.md"
+    },
+    {
+      "texto": "Carpeta de Drive",
+      "url": "https://drive.google.com/drive/folders/121ANQkl_1f8XAPVhkL9WOHOMM5A-Y1ZW"
+    }
   ],
-  "notas": "Sin cambios en el mock ni en el backend: sesión solo de documentación. Trabajo en rama con PR en borrador; el run de Pages se producirá al fusionar."
+  "notas": "Sin cambios en el mock ni en el backend: sesión solo de documentación. Trabajo en rama con PR en borrador; el run de Pages se producirá al fusionar. Drive: carpeta nueva en la cuenta correcta, copias subidas."
 }
