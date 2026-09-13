@@ -1,10 +1,16 @@
 # Planificación de buscaproducto
 
-Esta carpeta arranca vacía: aquí va la planificación, las decisiones y los
-resúmenes de sesión **de este proyecto**, y solo aquí se editan.
+Documentos del proyecto, en orden de lectura:
 
-El historial de la plantilla de origen
+| Documento | Qué es |
+|---|---|
+| [PLAN.md](PLAN.md) | Plan maestro: visión, los 9 criterios de «mejor buscador posible», requisitos, fases, estrategia de fuentes e IA, costes, riesgos, verificación |
+| [HOJA_DE_RUTA.md](HOJA_DE_RUTA.md) | Las 23 sesiones, con criterio verificable y prompt de arranque para cada una; secretos que crear |
+| [ARQUITECTURA.md](ARQUITECTURA.md) | Diseño técnico: frontend en Pages, backend FastAPI en Fly, modelo de datos, API, adaptadores, agentes IA, anti-bloqueo, crons, seguridad, tests |
+| [CATALOGO_HERRAMIENTAS.md](CATALOGO_HERRAMIENTAS.md) | 39 herramientas en 7 categorías con URL de búsqueda `{q}` y nivel de integración; cómo añadir una a mano |
+| [DECISIONES.md](DECISIONES.md) | Registro de decisiones (ADR) con plan B |
+| `sesiones/` | Resumen de 5 líneas de cada sesión |
+
+Solo aquí se edita la planificación. El historial de la plantilla de origen
 ([`npiobject-labs/DesdeMovil`](https://github.com/npiobject-labs/DesdeMovil)) está en
-[`../plantilla/`](../plantilla/): describe cómo se validó el flujo "PC arranca,
-móvil continúa" y sigue nombrando al proyecto original. Es referencia; no se
-edita ni se mezcla con lo de aquí.
+[`../plantilla/`](../plantilla/): referencia de solo lectura, no se mezcla con lo de aquí.

@@ -55,6 +55,7 @@ Pages está siempre activo. Fly también: `FLY_API_TOKEN` es un secreto de la or
 
 ## Documentación
 
+- La planificación del proyecto está en `docs/planificacion/`: empieza por `PLAN.md` y sigue la sesión que toque en `HOJA_DE_RUTA.md` (cada una lleva su prompt de arranque). Las decisiones (p. ej. backend en Python a partir de F2, D-01) están en `DECISIONES.md`.
 - Cada documento de planificación, decisión o resumen de sesión se escribe en `docs/planificacion/` de este repo, y solo ahí se edita.
 - Si existe `docs/plantilla/`, es el historial de la plantilla de origen que apartó `init-plantilla.yml`: referencia de solo lectura, nunca se edita ni se mezcla con `docs/planificacion/`.
 - Si hay id de Drive en **Parámetros**, al cerrar sesión se sube copia como fichero, sin conversión a formato Google (`disableConversionToGoogleType=true`), tanto `.md` como `.html/.png/.svg`.
