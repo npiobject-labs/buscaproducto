@@ -339,7 +339,7 @@ const DEMO_PRODUCTOS = [
   ['Beelink SER5 AMD Ryzen 5 5560U 16GB 500GB', 16, 500, 'AMD Ryzen 5 5560U', 45, false, [['pccomponentes', 329, 0, 'nuevo', 4.5], ['ebay', 299, 8, 'nuevo', 4.3]]],
   ['Minisforum UM790 Pro Ryzen 9 7940HS 32GB 1TB', 32, 1024, 'AMD Ryzen 9 7940HS', 65, false, [['pccomponentes', 649, 0, 'nuevo', 4.7]]],
   ['HP EliteDesk 800 G4 Mini i5-8500T 8GB 256GB reacondicionado', 8, 256, 'Intel Core i5-8500T', 35, true, [['backmarket', 149, 0, 'reacondicionado', 4.3]]],
-  ['Bmax B4 Plus N100 16GB 512GB', 16, 512, 'Intel N100', 15, true, [['amazon-es', 349, 0, 'nuevo', 4.0]]],
+  ['Bmax B4 Plus N100 16GB 512GB', 16, 512, 'Intel N100', 15, true, [['pccomponentes', 349, 0, 'nuevo', 4.0], ['amazon-es', 339, 0, 'nuevo', 4.0]]],
 ].map(([nombre, ram, alm, cpu, tdp, apto, ofertas], i) => ({
   producto_id: 100 + i, nombre, imagen_url: null, atributos: { ram_gb: ram, almacenamiento_gb: alm, cpu, tdp_w: tdp, apto_24_7: apto, apto_24_7_origen: 'heuristica', marca: nombre.split(' ')[0], formato: 'minipc' },
   ofertas: ofertas.map(([fuente, precio, envio, est, val], j) => ({ id: 1000 + i * 10 + j, url: 'https://' + fuente + '.example/p/' + (i * 10 + j), titulo: nombre, precio, envio, precio_total: +(precio + envio).toFixed(2), estado_producto: est, fuente, fuente_nombre: (DEMO_HERR.find((h) => h.slug === fuente) || {}).nombre || fuente, valoracion: val, puntuacion: 0, explicacion: [], vigilada: 0 })),
@@ -570,7 +570,8 @@ function filtrosActuales() {
   const n = (id) => { const v = parseFloat($(id).value); return isNaN(v) ? null : v; };
   return { precio_min: n('#fPrecioMin'), precio_max: n('#fPrecioMax'), ram_min: n('#fRam'), almacenamiento_min: n('#fAlm'), estado: $('#fEstado').value || null, orden: $('#fOrden').value, fuentes: $('#fFuente').value || null, apto_24_7: $('#f247').checked, fuera_rango: $('#fFuera').checked };
 }
-['#fPrecioMin', '#fPrecioMax', '#fRam', '#fAlm', '#fEstado', '#fOrden', '#fFuente', '#f247', '#fFuera'].forEach((s) => ($(s).onchange = () => cargarResultados()));
+let filtroT; const filtrar = () => { clearTimeout(filtroT); filtroT = setTimeout(cargarResultados, 250); };
+['#fPrecioMin', '#fPrecioMax', '#fRam', '#fAlm', '#fEstado', '#fOrden', '#fFuente', '#f247', '#fFuera'].forEach((s) => { $(s).onchange = filtrar; $(s).oninput = filtrar; });
 $('#btnLimpiar').onclick = () => { ['#fPrecioMin', '#fPrecioMax'].forEach((s) => ($(s).value = '')); ['#fRam', '#fAlm', '#fEstado', '#fFuente'].forEach((s) => ($(s).value = '')); $('#fOrden').value = 'puntuacion'; $('#f247').checked = false; $('#fFuera').checked = false; cargarResultados(); };
 async function cargarResultados() {
   if (!estado.busquedaId) return;
