@@ -1,0 +1,38 @@
+{
+  "fecha": "2026-09-13T21:55:00+02:00",
+  "titulo": "Fusión en main y verificación del despliegue completo",
+  "objetivo": "Fusionar la PR #1 (planificación y desarrollo F1–F8) en main y comprobar que todos los workflows publican y despliegan desde la rama por defecto.",
+  "prompts": [
+    {
+      "texto": "Fusiona PR en main"
+    }
+  ],
+  "cambios": [
+    "PR #1 fusionada en main con commit de fusión 8e94639 (20 commits, 115 ficheros, +11.565 / −651).",
+    "Sin cambios de código: esta entrada solo documenta la fusión y su verificación."
+  ],
+  "sha": "8e94639",
+  "sha_completo": "8e946397a4d0787a0a1ab85afd32410cbc6fba65",
+  "run": "34778992100",
+  "mock": "mocks/000-mock0.html",
+  "build": "BU-B1-20260913-003",
+  "pagina": "index.html",
+  "fly": "https://buscaproducto-npiobject-labs.fly.dev/salud",
+  "pendiente": [
+    "Crear el secreto BP_CLAVE: sin él /api/v1 responde 503 y no corren vigilar.yml ni cosechar.yml",
+    "Crear BP_IA_TOKEN (gateway de IA), SERPER_API_KEY, EBAY_CLIENT_ID/SECRET, FIRECRAWL_API_KEY y TELEGRAM_BOT_TOKEN/CHAT_ID",
+    "Probar la web instalada en el móvil y medir los criterios de cierre C1, C2, C5 y C6 con los secretos puestos",
+    "Decidir si se paga Keepa para cubrir Amazon (D-15)"
+  ],
+  "enlaces": [
+    {
+      "texto": "PR #1 fusionada",
+      "url": "https://github.com/npiobject-labs/buscaproducto/pull/1"
+    },
+    {
+      "texto": "Hoja de ruta y estado",
+      "url": "planificacion/HOJA_DE_RUTA.md"
+    }
+  ],
+  "notas": "Verificación tras la fusión, toda por la API de GitHub porque el sandbox no alcanza Pages ni Fly: Pages, CI, Fly y fuentes en success sobre el SHA 8e94639; el despliegue de Pages figura como success apuntando a la web; no aparece ningún run de «pages build and deployment», así que el sitio se sirve desde Actions con docs/ y no desde la rama. El humo de /api/v1 sigue omitiéndose por falta de BP_CLAVE."
+}
