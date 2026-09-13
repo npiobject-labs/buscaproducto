@@ -1,0 +1,55 @@
+name: Vigilar precios y alertas
+
+# Cron diario: despierta el backend en Fly y le pide que refresque las ofertas vigiladas,
+# apunte el historico de precios y dispare las alertas (Telegram). Requiere el secreto BP_CLAVE.
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vigilar
+  cancel-in-progress: false
+
+jobs:
+  vigilar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BP_CLAVE: ${{ secrets.BP_CLAVE }}
+      FLY_APP_VAR: ${{ vars.FLY_APP }}
+    steps:
+      - name: Determinar la app de Fly
+        id: app
+        run: |
+          if [ -n "${FLY_APP_VAR}" ]; then app="${FLY_APP_VAR}"; else
+            nombre="${GITHUB_REPOSITORY#*/}"; owner="${GITHUB_REPOSITORY%%/*}"
+            app="$(printf '%s-%s' "${nombre}" "${owner}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-' '-' | cut -c1-30 | sed 's/-*$//')"
+          fi
+          echo "app=${app}" >> "$GITHUB_OUTPUT"
+      - name: Lanzar la vigilancia
+        env:
+          FLY_APP: ${{ steps.app.outputs.app }}
+        run: |
+          [ -n "${BP_CLAVE}" ] || { echo "::error::Falta el secreto BP_CLAVE"; exit 1; }
+          url="https://${FLY_APP}.fly.dev/api/v1/tareas/vigilar"
+          for intento in 1 2 3; do
+            if respuesta="$(curl -fsS --max-time 600 -X POST -H "X-Clave: ${BP_CLAVE}" "${url}")"; then
+              echo "${respuesta}" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("relanzadas:", len(d["busquedas_relanzadas"]), "avisos:", len(d["avisos"]))'
+              {
+                echo "### Vigilancia diaria"
+                echo ""
+                echo '```json'
+                echo "${respuesta}" | python3 -m json.tool | head -80
+                echo '```'
+              } >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "Intento ${intento} fallido (la maquina puede estar despertando); reintento en 20 s"
+            sleep 20
+          done
+          echo "::error::La vigilancia no respondio"; exit 1
