@@ -2,7 +2,8 @@ app/target/
 docs/bitacora/index.json
 docs/mocks/index.html
 app/.venv/
-app/**/__pycache__/
+__pycache__/
+*.py[cod]
 app/.pytest_cache/
 app/.ruff_cache/
 app/datos/
