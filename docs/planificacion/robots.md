@@ -1,6 +1,6 @@
 # robots.txt de las fuentes
 
-Generado por `fuentes.yml` el 2026-09-13 18:05 UTC. User-Agent: `buscaproducto/1.0 (+https://github.com/npiobject-labs/buscaproducto)`.
+Generado por `fuentes.yml` el 2026-09-13 19:52 UTC. User-Agent: `buscaproducto/1.0 (+https://github.com/npiobject-labs/buscaproducto)`.
 
 | Dominio | Herramientas | Estado | Reglas relevantes (User-agent: * / buscaproducto) |
 |---|---|---|---|
@@ -38,7 +38,7 @@ Generado por `fuentes.yml` el 2026-09-13 18:05 UTC. User-Agent: `buscaproducto/1
 | https://www.geeknetic.es | geeknetic | 200 | Disallow: /campaign; Disallow: /pubbann; Disallow: /advert; Disallow: /sharelink/; Disallow: /clic.asp; Disallow: /comprecios-click.asp; Disallow: /comparador-precios/*/ver-tienda; Allow: /ads.txt |
 | https://www.google.es | gemini, google-shopping | 200 | (vacío) |
 | https://www.idealo.es | idealo | 403 | (vacío) |
-| https://www.kelkoo.es | kelkoo | 200 | Allow: /*ts=true*; Allow: /c/*tipo=*; Allow: /c/*marca=*; Allow: /c/*ps=true*; Allow: /c/*appliance_placement=*; Allow: /c/*brand=*; Allow: /c/*hob_type=*; Allow: /c/*loading_type=*; Allow: /c/*processor_family=*; Allow: /c/*product_type=*; Allow: /c/*purpose=*; Allow: /c/*sub_type=* … |
+| https://www.kelkoo.es | kelkoo | 200 | (vacío) |
 | https://www.mediamarkt.es | mediamarkt | 200 | (vacío) |
 | https://www.mediavida.com | forocoches | 200 | Disallow: /temp/; Disallow: /foro/thumbs.php; Disallow: /cache/; Disallow: /util/twitter.php |
 | https://www.notebookcheck.org | notebookcheck | 200 | Disallow: /nbcbattery/; Disallow: /cdn-cgi/ |
