@@ -1,0 +1,9 @@
+{
+ "href": "https://api.ebay.com/buy/browse/v1/item_summary/search?q=mini+pc+16gb&limit=50",
+ "total": 3,
+ "itemSummaries": [
+  {"itemId": "v1|256000000001|0", "title": "Beelink Mini S12 Pro Mini PC Intel N100 16GB DDR4 500GB SSD WiFi 6 Windows 11 Pro", "price": {"value": "189.00", "currency": "EUR"}, "condition": "Nuevo", "conditionId": "1000", "itemWebUrl": "https://www.ebay.es/itm/256000000001?mkevt=1&mkcid=1", "image": {"imageUrl": "https://i.ebayimg.com/images/g/abc/s-l225.jpg"}, "seller": {"username": "tienda_es", "feedbackPercentage": "99.5", "feedbackScore": 12034}, "shippingOptions": [{"shippingCostType": "FIXED", "shippingCost": {"value": "0.00", "currency": "EUR"}}], "itemLocation": {"country": "ES"}, "categories": [{"categoryId": "179", "categoryName": "Ordenadores de sobremesa"}]},
+  {"itemId": "v1|256000000002|0", "title": "GMKtec NucBox G3 Plus N150 16GB+1TB Mini PC Windows 11 Pro WiFi 6", "price": {"value": "229.90", "currency": "EUR"}, "condition": "Nuevo", "itemWebUrl": "https://www.ebay.es/itm/256000000002", "image": {"imageUrl": "https://i.ebayimg.com/images/g/def/s-l225.jpg"}, "seller": {"username": "gmktec_official", "feedbackPercentage": "98.9", "feedbackScore": 5400}, "shippingOptions": [{"shippingCostType": "FIXED", "shippingCost": {"value": "4.99", "currency": "EUR"}}]},
+  {"itemId": "v1|256000000003|0", "title": "Lenovo ThinkCentre M720q Tiny i5-8400T 16GB 512GB SSD reacondicionado", "price": {"value": "165.00", "currency": "EUR"}, "condition": "Reacondicionado por el vendedor", "itemWebUrl": "https://www.ebay.es/itm/256000000003", "seller": {"username": "refurb_pro", "feedbackPercentage": "97.0", "feedbackScore": 800}, "shippingOptions": []}
+ ]
+}

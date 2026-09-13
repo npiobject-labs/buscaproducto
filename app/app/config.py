@@ -60,7 +60,18 @@ class Config:
     apify_token: str = field(default_factory=lambda: os.environ.get("APIFY_TOKEN", ""))
     telegram_bot_token: str = field(default_factory=lambda: os.environ.get("TELEGRAM_BOT_TOKEN", ""))
     telegram_chat_id: str = field(default_factory=lambda: os.environ.get("TELEGRAM_CHAT_ID", ""))
-    # IA
+    # IA: gateway (por defecto el del proyecto) + token Bearer (BP_IA_TOKEN) o clave de Anthropic
+    ia_base_url: str = field(
+        default_factory=lambda: (
+            os.environ.get("BP_IA_BASE_URL")
+            or os.environ.get("ANTHROPIC_BASE_URL")
+            or "https://apisor.oracle402.com"
+        )
+    )
+    ia_token: str = field(default_factory=lambda: os.environ.get("BP_IA_TOKEN", ""))
+    ia_fallbacks: bool = field(
+        default_factory=lambda: os.environ.get("BP_IA_FALLBACKS", "1") not in ("0", "false", "no")
+    )
     modelo_principal: str = field(
         default_factory=lambda: os.environ.get("BP_MODELO_PRINCIPAL", "claude-opus-5")
     )

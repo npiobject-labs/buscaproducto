@@ -15,18 +15,18 @@
 
 | slug | Nombre | URL | url_plantilla_busqueda | tipo | Coste | nivel | fase | politica | Notas |
 |---|---|---|---|---|---|---|---|---|---|
-| `idealo` | Idealo | https://www.idealo.es | `https://www.idealo.es/resultados.html?q={q}` | web | gratis | B | F3 | verificar robots | Líder ES/EU; histórico y alertas propias |
+| `idealo` | Idealo | https://www.idealo.es | `https://www.idealo.es/resultados.html?q={q}` | web | gratis | C | F4 | verificar robots | Líder ES/EU. `fuentes.yml` 2026-09-13: 403 a peticiones directas → nivel C (Firecrawl) o D |
 | `google-shopping` | Google Shopping | https://shopping.google.es | `https://www.google.es/search?tbm=shop&q={q}` | web / api | gratis (Serper de pago) | A (Serper) | F3 | hostil (usar API) | Mayor cobertura; rango de precios |
-| `geizhals` | Geizhals / Skinflint | https://geizhals.eu | `https://geizhals.eu/?fs={q}` | web | gratis | B | F3 | verificar robots | Filtros técnicos finísimos; el mejor para hardware |
+| `geizhals` | Geizhals / Skinflint | https://geizhals.eu | `https://geizhals.eu/?fs={q}` | web | gratis | C | F4 | verificar robots | Filtros técnicos finísimos. `fuentes.yml`: 403 anti-bot a peticiones directas → nivel C (Firecrawl) o D |
 | `kelkoo` | Kelkoo | https://www.kelkoo.es | `https://www.kelkoo.es/ss-{q}.html` (verificar) | web | gratis | C | F4 | verificar robots | Electrónica, informática |
-| `geeknetic` | Geeknetic Comparador | https://www.geeknetic.es/comparador-precios | `https://www.geeknetic.es/comparador-precios/buscar/{q}` (verificar) | web | gratis | C | F4 | verificar robots | Hardware, mercado ES |
+| `geeknetic` | Geeknetic Comparador | https://www.geeknetic.es/comparador-precios | `https://www.geeknetic.es/comparador-precios/buscar/{q}` (verificar) | web | gratis | C | F4 | verificar robots | Hardware, mercado ES. `fuentes.yml`: la URL redirige a la portada; plantilla pendiente de corregir |
 
 ## 2. Tiendas con buen buscador
 
 | slug | Nombre | URL | url_plantilla_busqueda | tipo | Coste | nivel | fase | politica | Notas |
 |---|---|---|---|---|---|---|---|---|---|
 | `amazon-es` | Amazon.es | https://www.amazon.es | `https://www.amazon.es/s?k={q}` | web | gratis | D → A (Keepa) | F2 / F8 | hostil (usar API) | Nunca scraping directo; Keepa opcional por coste |
-| `pccomponentes` | PcComponentes | https://www.pccomponentes.com | `https://www.pccomponentes.com/buscar/?query={q}` | web | gratis | C (Firecrawl) | F3 | verificar robots | Referencia de hardware ES; anti-bot probable |
+| `pccomponentes` | PcComponentes | https://www.pccomponentes.com | `https://www.pccomponentes.com/buscar/?query={q}` | web | gratis | C (Firecrawl) | F4 | verificar robots | Referencia de hardware ES. `fuentes.yml`: 403 anti-bot confirmado → solo Firecrawl o D |
 | `coolmod` | Coolmod | https://www.coolmod.com | `https://www.coolmod.com/busqueda/?q={q}` (verificar) | web | gratis | C | F4 | verificar robots | Hardware y gaming ES |
 | `ebay` | eBay | https://www.ebay.es | `https://www.ebay.es/sch/i.html?_nkw={q}` | web / api | gratis | A (Browse API) | F3 | api oficial | Nuevo y segunda mano; filtros de estado y precio |
 | `aliexpress` | AliExpress | https://es.aliexpress.com | `https://es.aliexpress.com/wholesale?SearchText={q}` | web / api | gratis | D | F2 | hostil (usar API) | Plazos largos, aduanas; Affiliate API solo si compensa |
@@ -40,7 +40,7 @@
 |---|---|---|---|---|---|---|---|---|---|
 | `keepa` | Keepa | https://keepa.com | — | extensión / api | API de pago | A | F8 | api oficial | Histórico de Amazon; opcional (≈ 19 €/mes) |
 | `camelcamelcamel` | CamelCamelCamel | https://es.camelcamelcamel.com | `https://es.camelcamelcamel.com/search?sq={q}` | web / extensión | gratis | D | F2 | n/a | Histórico Amazon + alertas email |
-| `chollometro` | Chollometro | https://www.chollometro.com | `https://www.chollometro.com/search?q={q}` | web / rss | gratis | B (RSS) | F3 | verificar robots | Comunidad de ofertas ES; RSS `/rss/busqueda?q={q}` (verificar) |
+| `chollometro` | Chollometro | https://www.chollometro.com | `https://www.chollometro.com/search?q={q}` | web | gratis | B | F3 | verificar robots | Comunidad de ofertas ES. Adaptador `chollometro` (HTML, datos en `data-vue3`); robots `Allow: /`. El RSS de búsqueda no existe (404) |
 | `changedetection` | changedetection.io | https://changedetection.io | — | self-hosted | OSS | — | — | n/a | Sustituido por el cosechador propio; queda como referencia |
 
 ## 4. Asistentes IA de compra
@@ -99,7 +99,9 @@ No aparecen como fuentes en la pestaña Búsqueda; sí en el catálogo (pestaña
 | `github-actions` | GitHub Actions | https://github.com/features/actions | saas | gratis (público) | Crons, cosechador con Playwright, verificaciones, copias | F5 / F8 |
 | `github-pages` | GitHub Pages | https://pages.github.com | saas | gratis | Frontend PWA | F1 |
 
-**Total: 39 herramientas** en 7 categorías (32 en las 6 de búsqueda). Objetivo C2 del plan: ≥ 12 devolviendo ofertas reales al cierre.
+**Total: 47 herramientas** en 7 categorías (42 en las 6 de búsqueda; 28 participan en las búsquedas). Objetivo C2 del plan: ≥ 12 devolviendo ofertas reales al cierre.
+
+Resultado real de `fuentes.yml` (2026-09-13, petición directa educada desde el runner): responden 200 Chollometro, ServeTheHome, YouTube y Geeknetic (portada); devuelven **403 anti-bot** Geizhals, PcComponentes, Kelkoo, Coolmod, MediaMarkt y Liliputing; 403 sin página de bloqueo Idealo, Back Market y Reddit; 404 NotebookCheck (URL errónea). Detalle en [enlaces.md](enlaces.md) y [robots.md](robots.md). Consecuencia: esas fuentes trabajan en nivel C (Firecrawl, si hay clave) o D; nunca se intenta evadir el bloqueo.
 
 ---
 

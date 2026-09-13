@@ -128,16 +128,27 @@ async def ejecutar(bd: BD, http: Http, bid: str, ia: Any = None) -> None:
     async def una(h: dict[str, Any]) -> None:
         async with semaforo:
             c = consulta.model_copy(update={"texto": consultas_por_fuente.get(h["slug"], consulta.texto)})
-            await consultar_fuente(bd, http, ia, bid, h, c, inter.get("usar_cache", True))
+            try:
+                await consultar_fuente(bd, http, ia, bid, h, c, inter.get("usar_cache", True))
+            except Exception as e:  # noqa: BLE001 - una fuente nunca tumba la búsqueda
+                await bd.evento(
+                    "fallo inesperado al guardar la fuente", h["slug"], "error", error=repr(e)[:400]
+                )
+                await bd.ejecutar(
+                    "UPDATE busqueda_fuentes SET estado = 'error', error = ? WHERE busqueda_id = ? AND herramienta_id = ?",
+                    (f"{type(e).__name__}: {str(e)[:200]}", bid, h["id"]),
+                )
 
     try:
-        await asyncio.wait_for(asyncio.gather(*(una(h) for h in fuentes)), timeout=config.timeout_busqueda_s)
-    except TimeoutError:
-        await bd.ejecutar(
-            "UPDATE busqueda_fuentes SET estado = 'error', error = 'tiempo agotado' WHERE busqueda_id = ? AND estado IN ('pendiente','en_curso')",
-            (bid,),
-        )
-    try:
+        try:
+            await asyncio.wait_for(
+                asyncio.gather(*(una(h) for h in fuentes)), timeout=config.timeout_busqueda_s
+            )
+        except TimeoutError:
+            await bd.ejecutar(
+                "UPDATE busqueda_fuentes SET estado = 'error', error = 'tiempo agotado' WHERE busqueda_id = ? AND estado IN ('pendiente','en_curso')",
+                (bid,),
+            )
         await enriquecer_con_ia(bd, ia, bid, specs)
         await reagrupar(bd, bid, ia)
         await bd.ejecutar(
@@ -261,8 +272,9 @@ async def guardar_ofertas(
                 commit=False,
             )
         else:
-            pid = await bd.ejecutar(
-                "INSERT INTO productos (clave_canonica, nombre, marca, modelo, categoria, atributos_json, imagen_url, actualizado) VALUES (?,?,?,?,?,?,?,?)",
+            # INSERT OR IGNORE: otra fuente puede haber creado el mismo producto en paralelo.
+            await bd.ejecutar(
+                "INSERT OR IGNORE INTO productos (clave_canonica, nombre, marca, modelo, categoria, atributos_json, imagen_url, actualizado) VALUES (?,?,?,?,?,?,?,?)",
                 (
                     clave,
                     titulo,
@@ -275,6 +287,7 @@ async def guardar_ofertas(
                 ),
                 commit=False,
             )
+            pid = (await bd.uno("SELECT id FROM productos WHERE clave_canonica = ?", (clave,)))["id"]
         existente = await bd.uno("SELECT id, precio, envio FROM ofertas WHERE hash = ?", (h_of,))
         if existente:
             oid = existente["id"]

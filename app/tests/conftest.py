@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-os.environ.setdefault("BP_CLAVE", "clave-de-prueba")
+os.environ["BP_CLAVE"] = "clave-de-prueba"
 os.environ.setdefault("BP_INTERVALO_DOMINIO", "0")
 os.environ.setdefault("BP_TIMEOUT_FUENTE", "5")
 

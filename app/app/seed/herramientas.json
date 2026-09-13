@@ -8,11 +8,11 @@
   "plantilla_por_verificar": false,
   "tipo_acceso": "web",
   "coste": "gratis",
-  "descripcion": "Líder ES/EU; histórico y alertas propias",
-  "nivel": "B",
+  "descripcion": "Líder ES/EU. fuentes.yml 2026-09-13: 403 a peticiones directas → nivel C (Firecrawl) o D",
+  "nivel": "C",
   "participa": true,
   "politica_scraping": "verificar robots",
-  "fase": "F3"
+  "fase": "F4"
  },
  {
   "slug": "google-shopping",
@@ -38,11 +38,11 @@
   "plantilla_por_verificar": false,
   "tipo_acceso": "web",
   "coste": "gratis",
-  "descripcion": "Filtros técnicos finísimos; el mejor para hardware",
-  "nivel": "B",
+  "descripcion": "Filtros técnicos finísimos. fuentes.yml: 403 anti-bot a peticiones directas → nivel C (Firecrawl) o D",
+  "nivel": "C",
   "participa": true,
   "politica_scraping": "verificar robots",
-  "fase": "F3"
+  "fase": "F4"
  },
  {
   "slug": "kelkoo",
@@ -68,7 +68,7 @@
   "plantilla_por_verificar": true,
   "tipo_acceso": "web",
   "coste": "gratis",
-  "descripcion": "Hardware, mercado ES",
+  "descripcion": "Hardware, mercado ES. fuentes.yml: la URL redirige a la portada; plantilla pendiente de corregir",
   "nivel": "C",
   "participa": true,
   "politica_scraping": "verificar robots",
@@ -98,11 +98,11 @@
   "plantilla_por_verificar": false,
   "tipo_acceso": "web",
   "coste": "gratis",
-  "descripcion": "Referencia de hardware ES; anti-bot probable",
+  "descripcion": "Referencia de hardware ES. fuentes.yml: 403 anti-bot confirmado → solo Firecrawl o D",
   "nivel": "C",
   "participa": true,
   "politica_scraping": "verificar robots",
-  "fase": "F3"
+  "fase": "F4"
  },
  {
   "slug": "coolmod",
@@ -231,9 +231,9 @@
   "url": "https://www.chollometro.com",
   "url_plantilla_busqueda": "https://www.chollometro.com/search?q={q}",
   "plantilla_por_verificar": false,
-  "tipo_acceso": "web / rss",
+  "tipo_acceso": "web",
   "coste": "gratis",
-  "descripcion": "Comunidad de ofertas ES; RSS /rss/busqueda?q={q} (verificar)",
+  "descripcion": "Comunidad de ofertas ES. Adaptador chollometro (HTML, datos en data-vue3); robots Allow: /. El RSS de búsqueda no existe (404)",
   "nivel": "B",
   "participa": true,
   "politica_scraping": "verificar robots",

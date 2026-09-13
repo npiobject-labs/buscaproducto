@@ -224,3 +224,34 @@ class Http:
 
         cuerpo, _, cache = await self.obtener(url, **kw)
         return _json.loads(cuerpo or b"null"), cache
+
+
+# ---------- HTML → texto/markdown para el adaptador universal y el Reparador ----------
+def html_a_markdown(html: str, url_base: str = "", maximo: int = 60_000) -> str:
+    """Conversión ligera y determinista: texto visible + enlaces como [texto](url) + imágenes como ![](src)."""
+    from urllib.parse import urljoin
+
+    from selectolax.parser import HTMLParser
+
+    arbol = HTMLParser(html)
+    for etiqueta in ("script", "style", "noscript", "svg", "iframe", "template", "head"):
+        for nodo in arbol.css(etiqueta):
+            nodo.decompose()
+    for a in arbol.css("a[href]"):
+        href = urljoin(url_base, a.attributes.get("href") or "")
+        texto = " ".join(a.text(separator=" ").split())
+        if texto and href.startswith("http"):
+            a.replace_with(f" [{texto}]({href}) ")
+    for img in arbol.css("img"):
+        src = img.attributes.get("src") or img.attributes.get("data-src") or ""
+        alt = " ".join((img.attributes.get("alt") or "").split())
+        if src.startswith("http"):
+            img.replace_with(f" ![{alt}]({src}) ")
+        else:
+            img.decompose()
+    cuerpo = arbol.body or arbol.root
+    texto = cuerpo.text(separator="\n") if cuerpo else ""
+    lineas = [" ".join(linea.split()) for linea in texto.splitlines()]
+    lineas = [linea for linea in lineas if linea]
+    salida = "\n".join(lineas)
+    return salida[:maximo]
