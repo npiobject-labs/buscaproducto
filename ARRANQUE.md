@@ -26,6 +26,8 @@ No hay nada que rellenar. `.github/workflows/init-plantilla.yml` deja el repo en
 | Sección **Parámetros** rellenada, id de Drive vaciado | `CLAUDE.md` |
 | Documentación heredada apartada a `docs/plantilla/` | `docs/planificacion/` queda limpia, con su `README.md` |
 
+> En **este** proyecto el backend dejó de ser Rust en la fase 2 (decisión D-01): `app/` es Python 3.12 con FastAPI y `uv`, así que ya no existen `app/Cargo.toml` ni `app/src/main.rs`. La tabla de arriba describe lo que hace la plantilla en un repo recién creado.
+
 Al final hace `grep` de todo lo que huela a plantilla fuera de `docs/plantilla/` y **falla el run si encuentra algo**: ese grep es el checklist real, no una lista de ficheros que revisar a mano. Después borra el marcador `.plantilla-pendiente`, se deshabilita a sí mismo y relanza `pages.yml`. Si al crear el repo no llegó a lanzarse, la sesión lo lanza desde **Actions → Inicializar plantilla → Run workflow**.
 
 No se borra a sí mismo porque no puede: `GITHUB_TOKEN` no tiene permiso para modificar nada bajo `.github/workflows/`, y un commit que lo intente hace que GitHub **rechace el push entero**. Por eso el workflow no toca ningún fichero de ahí y se apaga por la API en su lugar. Queda en el repo, deshabilitado e inerte —sin el marcador no haría nada aunque se relanzara—; bórralo a mano si te molesta.
