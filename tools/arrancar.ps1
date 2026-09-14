@@ -43,7 +43,12 @@ $env:BUILD_ID = "local-$sha"
 $env:PUERTO   = $PuertoApi
 $env:BP_CLAVE = $Clave
 $env:BP_BD    = Join-Path $App 'datos\buscaproducto.sqlite'
-$backend = Start-Process -FilePath 'uv' -ArgumentList @('run', '--directory', $App, 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', "$PuertoApi") -PassThru -NoNewWindow
+# Start-Process une los argumentos con espacios y NO los entrecomilla: pasar aqui una
+# ruta con espacios (C - Desarrollo\...) la parte en trozos y uv falla con "os error 2".
+# Por eso el directorio del proyecto va en -WorkingDirectory, no en --directory.
+$backend = Start-Process -FilePath 'uv' `
+  -ArgumentList @('run', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', "$PuertoApi") `
+  -WorkingDirectory $App -PassThru -NoNewWindow
 
 # El puerto tarda un instante en abrirse: se espera antes de anunciar nada.
 $listo = $false
@@ -60,8 +65,15 @@ foreach ($intento in 1..40) {
 }
 
 if (-not $listo) {
-  if (-not $backend.HasExited) { $backend | Stop-Process -Force }
-  Write-Host "arrancar : ERROR - el backend no abrio el puerto $PuertoApi. Puerto ocupado?" -ForegroundColor Red
+  if ($backend.HasExited) {
+    Write-Host "arrancar : ERROR - el backend termino con codigo $($backend.ExitCode) sin abrir el puerto." -ForegroundColor Red
+    Write-Host "arrancar : mira el error de uvicorn justo encima de estas lineas." -ForegroundColor Red
+  }
+  else {
+    $backend | Stop-Process -Force
+    Write-Host "arrancar : ERROR - el backend sigue vivo pero no abrio el puerto $PuertoApi. Puerto ocupado?" -ForegroundColor Red
+    Write-Host "arrancar : prueba con -PuertoApi 9080." -ForegroundColor Red
+  }
   exit 1
 }
 
