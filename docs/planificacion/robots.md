@@ -1,6 +1,6 @@
 # robots.txt de las fuentes
 
-Generado por `fuentes.yml` el 2026-09-13 19:52 UTC. User-Agent: `buscaproducto/1.0 (+https://github.com/npiobject-labs/buscaproducto)`.
+Generado por `fuentes.yml` el 2026-10-01 12:38 UTC. User-Agent: `buscaproducto/1.0 (+https://github.com/npiobject-labs/buscaproducto)`.
 
 | Dominio | Herramientas | Estado | Reglas relevantes (User-agent: * / buscaproducto) |
 |---|---|---|---|
@@ -10,17 +10,17 @@ Generado por `fuentes.yml` el 2026-09-13 19:52 UTC. User-Agent: `buscaproducto/1
 | https://claude.ai | claude | 200 | Allow: /api/desktop/; Disallow: /api/*; Disallow: /lti/* |
 | https://copilot.microsoft.com | copilot | 200 | Allow: /; Disallow: /chats/* |
 | https://core.telegram.org | telegram | 404 | (sin robots.txt) |
-| https://developer.ebay.com | ebay-browse | 403 | (vacío) |
+| https://developer.ebay.com | ebay-browse | 404 | (sin robots.txt) |
 | https://docs.claude.com | anthropic | 200 | Disallow: /api/ |
 | https://es.aliexpress.com | aliexpress | 200 | Disallow: /items/*; Disallow: /bin/*; Disallow: /search/*; Allow: /wholesale.html$; Allow: /wholesale-page-*.html; Disallow: /productdetail/*; Allow: /api/data_homepage.do; Disallow: /api/*; Disallow: /api*.do; Disallow: /apps/*; Disallow: /downloads/*; Disallow: /wishlist/* … |
-| https://es.camelcamelcamel.com | camelcamelcamel | 200 | Allow: /; Allow: /ads.txt; Disallow: /search; Disallow: /camels/new; Disallow: /product/*/detail; Disallow: /track; Disallow: /set_language; Disallow: /camels*; Disallow: /edit*; Disallow: /danazon/*; Disallow: /auth/*; Disallow: /camelfarm/ev … |
+| https://es.camelcamelcamel.com | camelcamelcamel | 200 | Allow: /ads.txt; Disallow: /search; Disallow: /camels/new; Disallow: /product/*/detail; Disallow: /track; Disallow: /set_language; Disallow: /camels*; Disallow: /edit*; Disallow: /danazon/*; Disallow: /auth/*; Disallow: /camelfarm/ev; Disallow: /force_desktop_view … |
 | https://es.wallapop.com | wallapop | 403 | (vacío) |
 | https://firecrawl.dev | firecrawl | 200 | Allow: /; Disallow: /_next/static/; Disallow: /_next/static/css/; Disallow: /logos; Disallow: /api/; Disallow: /assets; Disallow: /assets-original; Disallow: /fonts |
-| https://fly.io | fly | 200 | Allow: / |
+| https://fly.io | fly | 200 | Allow: /; Disallow: /dashboard |
 | https://forocoches.com | forocoches | 200 | Disallow: /foro/*styleid=; Disallow: /foro/calendar.php; Disallow: /foro/editpost.php; Disallow: /foro/memberlist.php; Disallow: /foro/misc.php; Disallow: /foro/newreply.php; Disallow: /foro/newthread.php; Disallow: /foro/printthread.php; Disallow: /foro/private.php; Disallow: /foro/register.php; Disallow: /foro/report.php; Disallow: /foro/showgroups.php … |
 | https://geizhals.eu | geizhals | 200 | Disallow: /; Disallow: /?rfetch=; Disallow: /redir/; Disallow: /analytics/; Disallow: /?fs=; Disallow: /*?*asuch=; Disallow: /*?*mobile=; Disallow: /*?*sort=; Disallow: /*?*bpim=; Disallow: /*?*bpmax=; Disallow: /*?*v=; Disallow: /*?*plz= … |
 | https://gemini.google.com | gemini | 200 | Allow: /app/download; Disallow: /app/; Disallow: /chat/ |
-| https://github.com | crawl4ai, github-actions | 200 | Allow: /*?tab=achievements&achievement=*; Disallow: /*/*/pulse; Disallow: /*/*/projects; Disallow: /*/*/forks; Disallow: /*/*/issues/new; Disallow: /*/*/milestones/new; Disallow: /*/*/issues/search; Disallow: /*/*/commits/; Disallow: /*/*/branches; Disallow: /*/*/contributors; Disallow: /*/*/tags; Disallow: /*/*/stargazers … |
+| https://github.com | crawl4ai, github-actions | 200 | Allow: /*?tab=achievements&achievement=*; Allow: /topics/download*; Allow: /topics/comments*; Allow: /marketplace/actions/download*; Disallow: /*/*/pulse; Disallow: /*/*/projects; Disallow: /*/*/forks; Disallow: /*/*/issues/new; Disallow: /*/*/milestones/new; Disallow: /*/*/issues/search; Disallow: /*/*/commits/; Disallow: /*/*/branches … |
 | https://keepa.com | keepa, keepa-api | 200 | Disallow: /r/; Disallow: /ajax/; Disallow: /refererControlDisqus.html |
 | https://liliputing.com | liliputing | 200 | Allow: /; Disallow: /wp-login.php; Disallow: /wp-admin/; Crawl-delay: 10 |
 | https://pages.github.com | github-pages | 200 | (vacío) |
@@ -40,7 +40,7 @@ Generado por `fuentes.yml` el 2026-09-13 19:52 UTC. User-Agent: `buscaproducto/1
 | https://www.idealo.es | idealo | 403 | (vacío) |
 | https://www.kelkoo.es | kelkoo | 200 | (vacío) |
 | https://www.mediamarkt.es | mediamarkt | 200 | (vacío) |
-| https://www.mediavida.com | forocoches | 200 | Disallow: /temp/; Disallow: /foro/thumbs.php; Disallow: /cache/; Disallow: /util/twitter.php |
+| https://www.mediavida.com | forocoches | 200 | Disallow: /temp/; Disallow: /foro/thumbs.php; Disallow: /cache/; Disallow: /util/twitter.php; Disallow: /login; Disallow: /registro; Disallow: /foro/*/responder$ |
 | https://www.notebookcheck.org | notebookcheck | 200 | Disallow: /nbcbattery/; Disallow: /cdn-cgi/ |
 | https://www.pccomponentes.com | pccomponentes | 403 | (vacío) |
 | https://www.perplexity.ai | perplexity | 200 | Disallow: /*?*q=; Disallow: /search/new; Disallow: /search?*/; Disallow: /marketing/prerelease/; Disallow: /onboarding/; Disallow: /join/ |
